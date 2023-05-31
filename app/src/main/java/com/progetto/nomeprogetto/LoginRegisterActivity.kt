@@ -2,7 +2,10 @@ package com.progetto.nomeprogetto
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
+import com.progetto.nomeprogetto.Fragments.LoginFragment
+import com.progetto.nomeprogetto.Fragments.RegisterFragment
 import com.progetto.nomeprogetto.databinding.ActivityLoginRegisterBinding
 
 class LoginRegisterActivity : AppCompatActivity() {
@@ -16,6 +19,14 @@ class LoginRegisterActivity : AppCompatActivity() {
 
         binding.loginButton.setOnClickListener{
             openFragment(LoginFragment())
+            binding.loginButton.visibility = View.INVISIBLE
+            binding.registerButton.visibility = View.INVISIBLE
+        }
+
+        binding.registerButton.setOnClickListener{
+            openFragment(RegisterFragment())
+            binding.loginButton.visibility = View.INVISIBLE
+            binding.registerButton.visibility = View.INVISIBLE
         }
     }
 
@@ -24,15 +35,5 @@ class LoginRegisterActivity : AppCompatActivity() {
         val transaction = manager.beginTransaction()
         transaction.replace(binding.fragmentContainer.id,fragment)
         transaction.commit()
-    }
-
-    private fun closeFragment(){
-        val manager = supportFragmentManager
-        val fragment = manager.findFragmentById(binding.fragmentContainer.id)
-        if(fragment != null){
-            val transaction = manager.beginTransaction()
-            transaction.remove(fragment)
-            transaction.commit()
-        }
     }
 }
