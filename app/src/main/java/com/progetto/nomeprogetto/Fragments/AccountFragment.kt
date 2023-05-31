@@ -18,5 +18,4 @@ class AccountFragment : Fragment() {
     ): View? {
         binding = FragmentAccountBinding.inflate(inflater)
         return binding.root
-    }
-}
+    }}
