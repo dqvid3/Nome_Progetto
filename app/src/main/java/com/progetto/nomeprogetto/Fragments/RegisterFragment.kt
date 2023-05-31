@@ -9,7 +9,6 @@ import com.progetto.nomeprogetto.R
 
 
 class RegisterFragment : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
