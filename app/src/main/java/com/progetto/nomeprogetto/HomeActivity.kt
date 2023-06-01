@@ -1,5 +1,7 @@
 package com.progetto.nomeprogetto
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,15 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         bottomNavigationSetUp()
+
+        binding.logoutButton.setOnClickListener{
+            val sharedPref = getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+            val editor = sharedPref.edit()
+            editor.putBoolean("IS_LOGGED_IN", false)
+            editor.apply()
+            val i = Intent(this, SplashScreenActivity::class.java)
+            startActivity(i)
+        }
     }
 
     private fun openFragment(fragment: Fragment){
