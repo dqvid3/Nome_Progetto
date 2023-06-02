@@ -1,6 +1,5 @@
 package com.progetto.nomeprogetto
 
-import com.progetto.nomeprogetto.R
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
