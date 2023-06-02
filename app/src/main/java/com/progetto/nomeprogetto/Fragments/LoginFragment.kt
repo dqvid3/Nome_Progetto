@@ -23,7 +23,7 @@ class LoginFragment : Fragment() {
 
         binding.loginButton.setOnClickListener{
             //se il login va a buon fine :
-            val sharedPref = requireActivity().getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+            val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             val editor = sharedPref.edit()
             editor.putBoolean("IS_LOGGED_IN", true)
             editor.apply()

@@ -1,6 +1,6 @@
 package com.progetto.nomeprogetto
 
-import android.R
+import com.progetto.nomeprogetto.R
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -20,7 +20,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed(Runnable {
             val i: Intent
-            val sharedPref = getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+            val sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
             if(isLoggedIn)
                 i = Intent(this@SplashScreenActivity, HomeActivity::class.java)
@@ -33,6 +33,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
     override fun finish() {
         super.finish()
-        overridePendingTransition(R.anim.fade_in,R.anim.fade_out)
+        overridePendingTransition(androidx.constraintlayout.widget.R.anim.abc_fade_in,
+            androidx.appcompat.R.anim.abc_fade_out)
     }
 }

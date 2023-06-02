@@ -22,7 +22,7 @@ class HomeActivity : AppCompatActivity() {
         bottomNavigationSetUp()
 
         binding.logoutButton.setOnClickListener{
-            val sharedPref = getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+            val sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             val editor = sharedPref.edit()
             editor.putBoolean("IS_LOGGED_IN", false)
             editor.apply()
@@ -49,7 +49,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun bottomNavigationSetUp(){
-
         // Controllare se ci sia già in un fragment?
 
         val bottomNavigationView = binding.bottomNavigation
