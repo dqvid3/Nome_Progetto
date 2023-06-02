@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.RegisterFragment
 import com.progetto.nomeprogetto.databinding.ActivityLoginRegisterBinding
@@ -27,6 +28,11 @@ class LoginRegisterActivity : AppCompatActivity() {
             val i = Intent(this,HomeActivity::class.java)
             startActivity(i)
         }
+
+        binding.registerTextView.setOnClickListener{
+            openFragment(RegisterFragment())
+            binding.constraintLayout.visibility = View.GONE
+        }
     }
 
     private fun openFragment(fragment: Fragment){
@@ -34,5 +40,6 @@ class LoginRegisterActivity : AppCompatActivity() {
         val transaction = manager.beginTransaction()
         transaction.replace(binding.fragmentContainer.id,fragment)
         transaction.commit()
+        binding.fragmentContainer.bringToFront()
     }
 }

@@ -25,8 +25,9 @@ class RegisterFragment : Fragment() {
         binding.button.setOnClickListener{
             //se registrazione avvenuta con successo mostra la pagina di login dinuovo
             //altrimenti mostra toast con errore
-            val i = Intent(requireContext(), LoginRegisterActivity::class.java)
-            startActivity(i)
+            val fragmentTransaction = parentFragmentManager.beginTransaction()
+            fragmentTransaction.remove(this)
+            fragmentTransaction.commit()
         }
 
         return binding.root

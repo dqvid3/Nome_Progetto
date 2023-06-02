@@ -7,6 +7,16 @@
     android:background="@color/redPart"
     tools:context=".LoginRegisterActivity">
 
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
@@ -18,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:shadowColor="#000000"
+        android:background="@color/redPart"
         android:text="@string/welcomeMessage"
         android:textColor="@color/white"
         android:textSize="48sp"
@@ -27,17 +37,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.814" />
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
-        />
-
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -124,8 +125,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="  Registrati"
-                android:clickable="true"
-                android:focusable="true"
                 android:textColor="@color/redPart"
                 android:textSize="20dp"
                 android:textStyle="bold" />
