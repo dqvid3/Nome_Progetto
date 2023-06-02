@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.progetto.nomeprogetto.Fragments.LoginFragment
 import com.progetto.nomeprogetto.Fragments.RegisterFragment
 import com.progetto.nomeprogetto.databinding.ActivityLoginRegisterBinding
 
@@ -18,21 +19,7 @@ class LoginRegisterActivity : AppCompatActivity() {
         binding = ActivityLoginRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.loginButton.setOnClickListener{
-            //se il login va a buon fine :
-            val sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            editor.putBoolean("IS_LOGGED_IN", true)
-            editor.apply()
-
-            val i = Intent(this,HomeActivity::class.java)
-            startActivity(i)
-        }
-
-        binding.registerTextView.setOnClickListener{
-            openFragment(RegisterFragment())
-            binding.constraintLayout.visibility = View.GONE
-        }
+       openFragment(LoginFragment())
     }
 
     private fun openFragment(fragment: Fragment){
@@ -40,6 +27,5 @@ class LoginRegisterActivity : AppCompatActivity() {
         val transaction = manager.beginTransaction()
         transaction.replace(binding.fragmentContainer.id,fragment)
         transaction.commit()
-        binding.fragmentContainer.bringToFront()
     }
 }
