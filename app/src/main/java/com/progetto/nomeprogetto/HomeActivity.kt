@@ -1,46 +1,38 @@
 package com.progetto.nomeprogetto
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.AccountFragment
 import com.progetto.nomeprogetto.Fragments.CartFragment
+import com.progetto.nomeprogetto.Fragments.HomeFragment
 import com.progetto.nomeprogetto.Fragments.SettingsFragment
 import com.progetto.nomeprogetto.databinding.ActivityHomeBinding
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bottomNavigationSetUp()
+        openFragment(HomeFragment())
 
-        binding.logoutButton.setOnClickListener{
-            val sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            editor.putBoolean("IS_LOGGED_IN", false)
-            editor.apply()
-            val i = Intent(this, SplashScreenActivity::class.java)
-            startActivity(i)
-        }
+        bottomNavigationSetUp()
     }
 
     private fun openFragment(fragment: Fragment){
         val manager = supportFragmentManager
         val transaction = manager.beginTransaction()
-        transaction.replace(binding.fragmentContainer.id,fragment)
+        transaction.replace(binding.homeFragmentContainer.id,fragment)
         transaction.commit()
     }
 
     private fun closeFragment(){
         val manager = supportFragmentManager
-        val fragment = manager.findFragmentById(binding.fragmentContainer.id)
+        val fragment = manager.findFragmentById(binding.homeFragmentContainer.id)
         if(fragment != null){
             val transaction = manager.beginTransaction()
             transaction.remove(fragment)
