@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import com.progetto.nomeprogetto.LoginRegisterActivity
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.SplashScreenActivity
 import com.progetto.nomeprogetto.databinding.FragmentHomeBinding
@@ -42,8 +43,14 @@ class HomeFragment : Fragment() {
             val editor = sharedPref.edit()
             editor.putBoolean("IS_LOGGED_IN", false)
             editor.apply()
-            val i = Intent(requireContext(), SplashScreenActivity::class.java)
+            val i = Intent(requireContext(), LoginRegisterActivity::class.java)
             startActivity(i)
+
+            val fragmentManager = parentFragmentManager
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.remove(this)
+            fragmentTransaction.commit()
+            requireActivity().finish()
         }
 
         binding.uploadPicture.setOnClickListener{

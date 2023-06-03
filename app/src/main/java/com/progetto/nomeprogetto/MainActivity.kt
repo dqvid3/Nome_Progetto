@@ -9,7 +9,7 @@ import com.progetto.nomeprogetto.Fragments.HomeFragment
 import com.progetto.nomeprogetto.Fragments.SettingsFragment
 import com.progetto.nomeprogetto.databinding.ActivityHomeBinding
 
-class HomeActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
 
@@ -30,16 +30,6 @@ class HomeActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    private fun closeFragment(){
-        val manager = supportFragmentManager
-        val fragment = manager.findFragmentById(binding.homeFragmentContainer.id)
-        if(fragment != null){
-            val transaction = manager.beginTransaction()
-            transaction.remove(fragment)
-            transaction.commit()
-        }
-    }
-
     private fun bottomNavigationSetUp(){
         // Controllare se ci sia già in un fragment?
 
@@ -47,7 +37,7 @@ class HomeActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener{ item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    closeFragment()
+                    openFragment(HomeFragment())
                     true
                 }
                 R.id.navigation_cart -> {

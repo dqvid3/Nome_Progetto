@@ -22,7 +22,7 @@ class SplashScreenActivity : AppCompatActivity() {
             val sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
             if(isLoggedIn)
-                i = Intent(this@SplashScreenActivity, HomeActivity::class.java)
+                i = Intent(this@SplashScreenActivity, MainActivity::class.java)
             else
                 i = Intent(this@SplashScreenActivity, LoginRegisterActivity::class.java)
             startActivity(i)

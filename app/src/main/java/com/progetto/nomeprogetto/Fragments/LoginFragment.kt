@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.progetto.nomeprogetto.HomeActivity
+import com.progetto.nomeprogetto.MainActivity
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.FragmentLoginBinding
 
@@ -28,8 +28,9 @@ class LoginFragment : Fragment() {
             editor.putBoolean("IS_LOGGED_IN", true)
             editor.apply()
 
-            val i = Intent(requireContext(), HomeActivity::class.java)
+            val i = Intent(requireContext(), MainActivity::class.java)
             startActivity(i)
+            requireActivity().finish()
         }
 
         binding.registerTextView.setOnClickListener{
