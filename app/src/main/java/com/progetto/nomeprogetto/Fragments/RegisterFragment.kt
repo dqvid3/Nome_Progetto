@@ -28,9 +28,8 @@ class RegisterFragment : Fragment() {
     }
 
     private fun openFragment(fragment: Fragment){
-        val manager = parentFragmentManager
-        val transaction = manager.beginTransaction()
-        transaction.replace(R.id.fragment_container,fragment)
-        transaction.commit()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container,fragment)
+            .commit()
     }
 }

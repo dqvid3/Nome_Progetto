@@ -46,10 +46,10 @@ class HomeFragment : Fragment() {
             val i = Intent(requireContext(), LoginRegisterActivity::class.java)
             startActivity(i)
 
-            val fragmentManager = parentFragmentManager
-            val fragmentTransaction = fragmentManager.beginTransaction()
-            fragmentTransaction.remove(this)
-            fragmentTransaction.commit()
+            parentFragmentManager.beginTransaction()
+                .remove(this)
+                .commit()
+
             requireActivity().finish()
         }
 

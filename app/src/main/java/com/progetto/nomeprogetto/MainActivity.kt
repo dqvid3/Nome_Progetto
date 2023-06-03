@@ -1,6 +1,9 @@
 package com.progetto.nomeprogetto
 
 import android.os.Bundle
+import android.os.Handler
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.AccountFragment
@@ -24,15 +27,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFragment(fragment: Fragment){
-        val manager = supportFragmentManager
-        val transaction = manager.beginTransaction()
-        transaction.replace(binding.homeFragmentContainer.id,fragment)
-        transaction.commit()
+        supportFragmentManager.beginTransaction()
+            .replace(binding.homeFragmentContainer.id, fragment)
+            .commit();
     }
 
     private fun bottomNavigationSetUp(){
-        // Controllare se ci sia già in un fragment?
-
         val bottomNavigationView = binding.bottomNavigation
         bottomNavigationView.setOnItemSelectedListener{ item ->
             when (item.itemId) {
@@ -55,5 +55,18 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    private var backPressedOnce = false
+
+    override fun onBackPressed() {
+        if (backPressedOnce) {
+            moveTaskToBack(true)
+            return
+        }
+        backPressedOnce = true
+        Handler().postDelayed({
+            backPressedOnce = false
+        }, 2000)
     }
 }

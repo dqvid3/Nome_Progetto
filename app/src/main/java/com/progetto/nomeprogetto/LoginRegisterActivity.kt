@@ -19,9 +19,8 @@ class LoginRegisterActivity : AppCompatActivity() {
     }
 
     private fun openFragment(fragment: Fragment){
-        val manager = supportFragmentManager
-        val transaction = manager.beginTransaction()
-        transaction.replace(binding.fragmentContainer.id,fragment)
-        transaction.commit()
+        supportFragmentManager.beginTransaction()
+            .replace(binding.fragmentContainer.id,fragment)
+            .commit()
     }
 }
