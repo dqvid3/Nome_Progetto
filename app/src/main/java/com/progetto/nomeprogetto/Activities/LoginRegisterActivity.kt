@@ -1,4 +1,4 @@
-package com.progetto.nomeprogetto
+package com.progetto.nomeprogetto.Activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

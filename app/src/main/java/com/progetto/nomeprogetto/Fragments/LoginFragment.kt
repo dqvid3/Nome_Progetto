@@ -11,7 +11,7 @@ import android.widget.Toast
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.ClientNetwork
-import com.progetto.nomeprogetto.MainActivity
+import com.progetto.nomeprogetto.Activities.MainActivity
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.RequestLogin
 import com.progetto.nomeprogetto.databinding.FragmentLoginBinding
@@ -41,9 +41,9 @@ class LoginFragment : Fragment() {
     }
 
     private fun loginUser(requestLogin: RequestLogin){
-        val query = "select * from users where email = ${requestLogin.email} and password = ${requestLogin.password}"
+        val query = "select * from users where email = '${requestLogin.email}' and password = '${requestLogin.password}'"
 
-        ClientNetwork.retrofit.login(query).enqueue(
+        ClientNetwork.retrofit.sendQuery(query).enqueue(
             object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                     if (response.isSuccessful) {

@@ -1,24 +1,23 @@
-package com.progetto.nomeprogetto
+package com.progetto.nomeprogetto.Activities
 
 import android.os.Bundle
 import android.os.Handler
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.AccountFragment
 import com.progetto.nomeprogetto.Fragments.CartFragment
 import com.progetto.nomeprogetto.Fragments.HomeFragment
 import com.progetto.nomeprogetto.Fragments.SettingsFragment
-import com.progetto.nomeprogetto.databinding.ActivityHomeBinding
+import com.progetto.nomeprogetto.R
+import com.progetto.nomeprogetto.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHomeBinding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityHomeBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         openFragment(HomeFragment())

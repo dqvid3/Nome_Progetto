@@ -9,13 +9,13 @@ interface UserAPI {
 
     @POST("postSelect/")
     @FormUrlEncoded
-    fun login(@Field("query") query: String): Call<JsonObject>
+    fun sendQuery(@Field("query") query: String): Call<JsonObject>
 
     @POST("postUpdate/")
     @FormUrlEncoded
     fun modifica(@Field("query") query: String): Call<JsonObject>
 
     @GET
-    fun getAvatar(@Url url: String) : Call<ResponseBody>
+    fun getImage(@Url url: String) : Call<ResponseBody>
 
 }
