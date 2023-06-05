@@ -2,6 +2,8 @@ package com.progetto.nomeprogetto.Activities
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.AccountFragment
@@ -20,7 +22,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        openFragment(HomeFragment())
+        supportFragmentManager.beginTransaction()
+            .replace(binding.homeFragmentHomeContainer.id, HomeFragment(),"HomeFragment")
+            .commit()
 
         bottomNavigationSetUp()
     }
@@ -28,7 +32,8 @@ class MainActivity : AppCompatActivity() {
     private fun openFragment(fragment: Fragment){
         supportFragmentManager.beginTransaction()
             .replace(binding.homeFragmentContainer.id, fragment)
-            .commit();
+            .commit()
+        binding.homeFragmentHomeContainer.visibility = View.GONE
     }
 
     private fun bottomNavigationSetUp(){
@@ -36,7 +41,12 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener{ item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    openFragment(HomeFragment())
+                    supportFragmentManager.findFragmentById(binding.homeFragmentContainer.id)?.let {
+                        supportFragmentManager.beginTransaction()
+                            .remove(it)
+                            .commit()
+                    }
+                    binding.homeFragmentHomeContainer.visibility = View.VISIBLE
                     true
                 }
                 R.id.navigation_cart -> {
@@ -64,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         backPressedOnce = true
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             backPressedOnce = false
         }, 2000)
     }

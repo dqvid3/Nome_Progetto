@@ -1,6 +1,5 @@
 package com.progetto.nomeprogetto.Fragments
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,6 +11,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.*
+import com.progetto.nomeprogetto.Adapters.ProductAdapter
 import com.progetto.nomeprogetto.databinding.FragmentHomeBinding
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -29,32 +29,41 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val productList = ArrayList<Product>()
+        val adapter = ProductAdapter(productList)
+        binding.recyclerView.adapter = adapter
 
-        binding.recyclerView.adapter = ProductAdapter(ArrayList<Product>())
+        adapter.setOnClickListener(object: ProductAdapter.OnClickListener{
+            override fun onClick(product: Product) {
+                val bundle = Bundle()
+                bundle.putParcelable("product", product)
+                val productDetailFragment = ProductDetailFragment()
+                productDetailFragment.arguments = bundle
+                parentFragmentManager.beginTransaction().hide(this@HomeFragment)
+                    .add(R.id.home_fragment_home_container,productDetailFragment)
+                    .commit()
+            }
+        })
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if(!query.isNullOrBlank()) {
+                    setProducts(query,productList)
+                    binding.searchView.setQuery("",false)
                     binding.searchView.clearFocus()
                     return true
                 }
                 return false
             }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (!newText.isNullOrBlank()) {
-                    updateProducts(newText)
-                }
-                return true
-            }
+            override fun onQueryTextChange(newText: String?): Boolean { return true }
         })
 
         return binding.root
     }
 
-    private fun updateProducts(productSearched: String){
-        val products = ArrayList<Product>()
+    private fun setProducts(productSearched: String, productList: ArrayList<Product>){
+        productList.clear()
 
         val query = "SELECT p.id, p.name, p.description, p.price, p.width, p.height, p.length, p.stock, p.main_picture_path,\n" +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
@@ -62,7 +71,7 @@ class HomeFragment : Fragment() {
                 "FROM products p WHERE REPLACE(LOWER(p.name), ' ', '') LIKE REPLACE(LOWER('%$productSearched%'), ' ', '') " +
                 "ORDER BY CASE WHEN LOWER(p.name) LIKE LOWER('$productSearched%') THEN 0 ELSE 1 END, p.name ASC;"
 
-        ClientNetwork.retrofit.sendQuery(query).enqueue(
+        ClientNetwork.retrofit.select(query).enqueue(
             object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                     if (response.isSuccessful) {
@@ -82,29 +91,24 @@ class HomeFragment : Fragment() {
                                 val reviewsNumber = productObject.get("review_count").asInt
                                 val main_picture_path = productObject.get("main_picture_path").asString
 
-                                var main_picture: Bitmap? = null
-                                ClientNetwork.retrofit.getImage(main_picture_path).enqueue(
+                                ClientNetwork.retrofit.image(main_picture_path).enqueue(
                                     object : Callback<ResponseBody> {
                                         override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                                             if(response.isSuccessful) {
                                                 if (response.body()!=null) {
-                                                    main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                                    val main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
                                                     val product = Product(id, name, description, price,width,height,length,stock,main_picture,avgRating,reviewsNumber)
-                                                    products.add(product)
-                                                }else{
-                                                    val product = Product(id, name, description, price,width,height,length,stock,null,avgRating,reviewsNumber)
-                                                    products.add(product)
+                                                    productList.add(product)
                                                 }
                                             }
                                         }
                                         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {}
                                     }
                                 )
+
                             }
-                        } else {
-                            Toast.makeText(requireContext(), "Non esistono prodotti con questo nome", Toast.LENGTH_LONG).show()
-                        }
-                        binding.recyclerView.adapter = ProductAdapter(products)
+                        } else
+                            Toast.makeText(requireContext(), "Non è stato trovato nulla relativo al testo inserito", Toast.LENGTH_LONG).show()
                         binding.recyclerView.adapter?.notifyDataSetChanged()
                     }
                 }

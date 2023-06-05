@@ -43,7 +43,7 @@ class LoginFragment : Fragment() {
     private fun loginUser(requestLogin: RequestLogin){
         val query = "select * from users where email = '${requestLogin.email}' and password = '${requestLogin.password}'"
 
-        ClientNetwork.retrofit.sendQuery(query).enqueue(
+        ClientNetwork.retrofit.select(query).enqueue(
             object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                     if (response.isSuccessful) {
@@ -68,7 +68,7 @@ class LoginFragment : Fragment() {
 
     private fun openFragment(fragment: Fragment){
         parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container,fragment)
+            .replace(R.id.fragment_login_container,fragment)
             .commit()
     }
 }

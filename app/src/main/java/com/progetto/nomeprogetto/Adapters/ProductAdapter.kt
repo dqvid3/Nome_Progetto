@@ -1,8 +1,9 @@
-package com.progetto.nomeprogetto
+package com.progetto.nomeprogetto.Adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.progetto.nomeprogetto.Product
 import com.progetto.nomeprogetto.databinding.ProductViewDesignBinding
 
 class ProductAdapter(private var productList: List<Product>) : RecyclerView.Adapter<ProductAdapter.ViewHolder>() {
@@ -36,16 +37,16 @@ class ProductAdapter(private var productList: List<Product>) : RecyclerView.Adap
         holder.productName.text = product.name
         holder.avgRating.text = product.avgRating.toString()
         holder.ratingBar.rating = product.avgRating.toFloat()
-        holder.price.text = product.price.toString()
-        holder.reviewsNumber.text = product.reviewsNumber.toString()
+        holder.price.text = product.price.toString() + " €"
+        holder.reviewsNumber.text = "(" + product.reviewsNumber.toString() + ")"
 
         holder.itemView.setOnClickListener {
-            onClickListener?.onClick(position,product)
+            onClickListener?.onClick(product)
         }
     }
 
     interface OnClickListener {
-        fun onClick(position: Int, model: Product)
+        fun onClick(product: Product)
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {

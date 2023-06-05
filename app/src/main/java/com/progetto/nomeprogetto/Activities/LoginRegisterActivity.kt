@@ -15,12 +15,8 @@ class LoginRegisterActivity : AppCompatActivity() {
         binding = ActivityLoginRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-       openFragment(LoginFragment())
-    }
-
-    private fun openFragment(fragment: Fragment){
         supportFragmentManager.beginTransaction()
-            .replace(binding.fragmentContainer.id,fragment)
+            .replace(binding.fragmentLoginContainer.id,LoginFragment())
             .commit()
     }
 }

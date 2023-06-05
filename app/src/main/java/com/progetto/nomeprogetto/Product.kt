@@ -1,8 +1,11 @@
 package com.progetto.nomeprogetto
 
 import android.graphics.Bitmap
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-class Product (
+@Parcelize
+class Product(
     val id: Int,
     val name: String,
     val description: String,
@@ -13,4 +16,4 @@ class Product (
     val stock: Int,
     val main_picture: Bitmap?,
     val avgRating: Double,
-    val reviewsNumber: Int)
+    val reviewsNumber: Int) : Parcelable

@@ -1,8 +1,9 @@
-package com.progetto.nomeprogetto
+package com.progetto.nomeprogetto.Adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.progetto.nomeprogetto.ItemViewModel
 import com.progetto.nomeprogetto.databinding.CardViewDesignBinding
 
 class CustomAdapter(private var mList: List<ItemViewModel>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>(){

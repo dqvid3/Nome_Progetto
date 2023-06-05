@@ -21,15 +21,11 @@ class RegisterFragment : Fragment() {
         binding.button.setOnClickListener{
             //se registrazione avvenuta con successo mostra la pagina di login dinuovo
             //altrimenti mostra toast con errore
-            openFragment(LoginFragment())
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_login_container,LoginFragment())
+                .commit()
         }
 
         return binding.root
-    }
-
-    private fun openFragment(fragment: Fragment){
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container,fragment)
-            .commit()
     }
 }

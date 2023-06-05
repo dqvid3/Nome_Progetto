@@ -7,9 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
-import com.progetto.nomeprogetto.CustomAdapter
+import com.progetto.nomeprogetto.Adapters.CustomAdapter
 import com.progetto.nomeprogetto.ItemViewModel
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.FragmentCartBinding
