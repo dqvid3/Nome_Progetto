@@ -2,7 +2,6 @@ package com.progetto.nomeprogetto.Fragments
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.Image
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,8 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.google.gson.JsonObject
-import com.progetto.nomeprogetto.Adapters.ImageSliderAdapter
+import com.progetto.nomeprogetto.Adapters.ProductImageAdapter
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Product
 import com.progetto.nomeprogetto.R
@@ -24,6 +25,7 @@ import retrofit2.Response
 class ProductDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentProductDetailBinding
+    private var imageSelected: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,13 +38,34 @@ class ProductDetailFragment : Fragment() {
         } else
             arguments?.getParcelable("product")
 
-        val images = ArrayList<Bitmap>().apply {
-            product?.main_picture?.let { add(it) }
-        }
+        val imageList = ArrayList<Bitmap>()
+        product?.main_picture?.let { imageList.add(it) }
+        setImages(product?.id,imageList)
 
-        val adapter = ImageSliderAdapter(requireContext(), images)
-        binding.productImages.adapter = adapter
-        setImages(product?.id,adapter,images)
+        val snapHelper = LinearSnapHelper()
+        snapHelper.attachToRecyclerView(binding.recyclerView)
+        val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerView.layoutManager = layoutManager
+        binding.recyclerView.setOnFlingListener(null)
+        layoutManager.isSmoothScrollbarEnabled = true
+
+        val adapter = ProductImageAdapter(imageList)
+        binding.recyclerView.adapter = adapter
+
+        adapter.setOnClickListener(object: ProductImageAdapter.OnClickListener{
+            override fun onClick() {
+                val layoutParams = binding.recyclerView.layoutParams
+                if(!imageSelected) {
+                    layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                }else{
+                    layoutParams.height = resources.getDimensionPixelSize(R.dimen.recycler_view_height)
+                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                }
+                imageSelected = !imageSelected
+                binding.recyclerView.layoutParams = layoutParams
+            }
+        })
 
         binding.productName.text = product?.name
         binding.productDescription.text = product?.description
@@ -59,7 +82,7 @@ class ProductDetailFragment : Fragment() {
         return binding.root
     }
 
-    private fun setImages(productId: Int?, adapter: ImageSliderAdapter, images: ArrayList<Bitmap>){
+    private fun setImages(productId: Int?,imageList: ArrayList<Bitmap>){
         val query = "SELECT picture_path FROM product_pictures WHERE product_id = $productId;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
@@ -76,9 +99,10 @@ class ProductDetailFragment : Fragment() {
                                             if(response.isSuccessful) {
                                                 if (response.body()!=null) {
                                                     val picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                                    images.add(picture)
-                                                    if(i==picturesArray.size()-1)
-                                                        adapter.updateImages(images)
+                                                    imageList.add(picture)
+                                                    if(i==picturesArray.size()-1) {
+                                                        binding.recyclerView.adapter?.notifyDataSetChanged()
+                                                    }
                                                 }
                                             }
                                         }

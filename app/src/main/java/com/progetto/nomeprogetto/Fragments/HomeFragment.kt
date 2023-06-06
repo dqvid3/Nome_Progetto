@@ -99,6 +99,9 @@ class HomeFragment : Fragment() {
                                                     val main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
                                                     val product = Product(id, name, description, price,width,height,length,stock,main_picture,avgRating,reviewsNumber)
                                                     productList.add(product)
+                                                    if(i==productsArray.size()-1) {
+                                                        binding.recyclerView.adapter?.notifyDataSetChanged()
+                                                    }
                                                 }
                                             }
                                         }
@@ -109,7 +112,6 @@ class HomeFragment : Fragment() {
                             }
                         } else
                             Toast.makeText(requireContext(), "Non è stato trovato nulla relativo al testo inserito", Toast.LENGTH_LONG).show()
-                        binding.recyclerView.adapter?.notifyDataSetChanged()
                     }
                 }
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {

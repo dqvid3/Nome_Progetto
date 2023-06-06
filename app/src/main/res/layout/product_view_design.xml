@@ -55,7 +55,7 @@
                     style="@style/Widget.AppCompat.RatingBar.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:isIndicator="false"
+                    android:isIndicator="true"
                     android:progressTint="@android:color/holo_orange_dark"
                     android:progressBackgroundTint="@android:color/holo_orange_dark"
                     android:rating="2"
