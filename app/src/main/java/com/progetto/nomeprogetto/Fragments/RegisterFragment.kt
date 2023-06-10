@@ -18,13 +18,13 @@ class RegisterFragment : Fragment() {
     ): View? {
         binding = FragmentRegisterBinding.inflate(inflater)
 
-        binding.button.setOnClickListener{
+        /*binding.button.setOnClickListener{
             //se registrazione avvenuta con successo mostra la pagina di login dinuovo
             //altrimenti mostra toast con errore
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_login_container,LoginFragment())
                 .commit()
-        }
+        }*/
 
         return binding.root
     }

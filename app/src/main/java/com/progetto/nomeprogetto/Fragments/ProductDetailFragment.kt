@@ -154,7 +154,7 @@ class ProductDetailFragment : Fragment() {
                             val username = reviewObject.get("username").asString
                             val rating = reviewObject.get("rating").asInt
                             val comment = reviewObject.get("comment").asString
-                            val date = reviewObject.get("date").asString
+                            val date = reviewObject.get("review_date").asString
                             val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
                             val reviewDate = LocalDateTime.parse(date, formatter)
                             val productReview = ProductReview(username,rating,comment,reviewDate)
