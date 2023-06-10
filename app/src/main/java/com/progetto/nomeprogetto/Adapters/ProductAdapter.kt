@@ -3,7 +3,7 @@ package com.progetto.nomeprogetto.Adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.progetto.nomeprogetto.Product
+import com.progetto.nomeprogetto.Objects.Product
 import com.progetto.nomeprogetto.databinding.ProductViewDesignBinding
 
 class ProductAdapter(private var productList: List<Product>) : RecyclerView.Adapter<ProductAdapter.ViewHolder>() {

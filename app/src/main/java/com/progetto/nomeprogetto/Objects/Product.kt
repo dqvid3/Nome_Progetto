@@ -1,8 +1,9 @@
-package com.progetto.nomeprogetto
+package com.progetto.nomeprogetto.Objects
 
 import android.graphics.Bitmap
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.time.LocalDateTime
 
 @Parcelize
 class Product(
@@ -16,4 +17,6 @@ class Product(
     val stock: Int,
     val main_picture: Bitmap?,
     val avgRating: Double,
-    val reviewsNumber: Int) : Parcelable
+    val reviewsNumber: Int,
+    val uploadDate: LocalDateTime
+) : Parcelable

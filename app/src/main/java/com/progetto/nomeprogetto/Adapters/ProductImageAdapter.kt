@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.progetto.nomeprogetto.databinding.ImageViewDesignBinding
 
-class ProductImageAdapter(private var imageList: List<Bitmap>) : RecyclerView.Adapter<ProductImageAdapter.ViewHolder>() {
+class ProductImageAdapter(private var imageList: HashMap<Int,Bitmap>) : RecyclerView.Adapter<ProductImageAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 

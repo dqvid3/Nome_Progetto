@@ -1,4 +1,4 @@
-package com.progetto.nomeprogetto
+package com.progetto.nomeprogetto.Activities
 
 import android.content.Context
 import android.content.Intent
@@ -6,8 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.progetto.nomeprogetto.Activities.LoginRegisterActivity
-import com.progetto.nomeprogetto.Activities.MainActivity
+import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.ActivitySplashScreenBinding
 
 

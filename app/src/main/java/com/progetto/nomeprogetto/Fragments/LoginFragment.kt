@@ -13,7 +13,6 @@ import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Activities.MainActivity
 import com.progetto.nomeprogetto.R
-import com.progetto.nomeprogetto.RequestLogin
 import com.progetto.nomeprogetto.databinding.FragmentLoginBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,7 +29,7 @@ class LoginFragment : Fragment() {
         binding = FragmentLoginBinding.inflate(inflater)
 
         binding.loginButton.setOnClickListener{
-            loginUser(RequestLogin(binding.editTextEmail.text.toString(),binding.editTextPassword.text.toString()))
+            loginUser(binding.editTextEmail.text.toString(),binding.editTextPassword.text.toString())
         }
 
         binding.registerTextView.setOnClickListener{
@@ -40,8 +39,8 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
-    private fun loginUser(requestLogin: RequestLogin){
-        val query = "select * from users where email = '${requestLogin.email}' and password = '${requestLogin.password}'"
+    private fun loginUser(email: String, password: String){
+        val query = "select * from users where email = '${email}' and password = '${password}'"
 
         ClientNetwork.retrofit.select(query).enqueue(
             object : Callback<JsonObject> {
@@ -50,7 +49,6 @@ class LoginFragment : Fragment() {
                         if ((response.body()?.get("queryset") as JsonArray).size() == 1) {
                             val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
                             sharedPref.edit().putBoolean("IS_LOGGED_IN", true).apply()
-
                             startActivity(Intent(requireContext(), MainActivity::class.java))
                             requireActivity().finish()
                         } else {
@@ -58,7 +56,6 @@ class LoginFragment : Fragment() {
                         }
                     }
                 }
-
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                     Toast.makeText(requireContext(), "Failed to login: " + t.message, Toast.LENGTH_LONG).show()
                 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:enabled="false"
+        android:title="Filtra per" />
+    <item
+        android:id="@+id/lowest_price"
+        android:title="Prezzo più basso" />
+    <item
+        android:id="@+id/highest_price"
+        android:title="Prezzo più alto" />
+    <item
+        android:id="@+id/most_recent"
+        android:title="Più recenti" />
+    <item
+        android:id="@+id/least_recent"
+        android:title="Meno recenti" />
+    <item
+        android:id="@+id/highest_rating"
+        android:title="Più apprezzati" />
+    <item
+        android:id="@+id/lowest_rating"
+        android:title="Meno apprezzati" />
+</menu>

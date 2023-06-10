@@ -2,7 +2,6 @@ package com.progetto.nomeprogetto.Activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.LoginFragment
 import com.progetto.nomeprogetto.databinding.ActivityLoginRegisterBinding
 
