@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.ProductAdapter
 import com.progetto.nomeprogetto.ClientNetwork
@@ -33,6 +34,8 @@ class ProductFragment : Fragment() {
         binding = FragmentProductBinding.inflate(inflater)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecoration = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
+        binding.recyclerView.addItemDecoration(itemDecoration)
         val productList = ArrayList<Product>()
         val adapter = ProductAdapter(productList)
         binding.recyclerView.adapter = adapter

@@ -8,13 +8,16 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Scegli per categoria:"
-        android:textSize="18dp"/>
+        android:text="Scegli per categoria"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:scrollbars="horizontal"
-        android:layout_height="200dp" />
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="200dp"
+        />
 
 </LinearLayout>

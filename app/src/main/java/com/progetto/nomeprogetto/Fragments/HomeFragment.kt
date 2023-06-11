@@ -7,15 +7,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams
-import android.widget.GridLayout
 import android.widget.Toast
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.JsonObject
-import com.progetto.nomeprogetto.Adapters.ProductImageAdapter
+import com.progetto.nomeprogetto.Adapters.CategoryImageAdapter
 import com.progetto.nomeprogetto.ClientNetwork
-import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.FragmentHomeBinding
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -34,42 +30,41 @@ class HomeFragment : Fragment() {
 
         val linearLayoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
         binding.recyclerView.layoutManager = linearLayoutManager
-        val imageList = HashMap<Int, Bitmap>()
-        setImages(imageList)
-        val imageAdapter = ProductImageAdapter(imageList,400)
+        val categoriesList = HashMap<String,Bitmap>()
+        setCategories(categoriesList)
+        val imageAdapter = CategoryImageAdapter(categoriesList)
         binding.recyclerView.adapter = imageAdapter
-        imageAdapter.setOnClickListener(object: ProductImageAdapter.OnClickListener{
+        imageAdapter.setOnClickListener(object: CategoryImageAdapter.OnClickListener{
             override fun onClick() {
                 //cerca per categoria cliccata
             }
         })
 
-
         return binding.root
     }
 
-    private fun setImages(imageList: HashMap<Int,Bitmap>){
-        val query = "SELECT picture_path FROM categories"
+    private fun setCategories(categoriesList: HashMap<String,Bitmap>){
+        val query = "SELECT name,picture_path FROM categories"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if (response.isSuccessful) {
-                    val picturesArray = response.body()?.getAsJsonArray("queryset")
-                    if (picturesArray != null && picturesArray.size() > 0) {
-                        var loadedImages = 0
-                        for (i in 0 until picturesArray.size()) {
-                            val pictureObject = picturesArray[i].asJsonObject
-                            val picture_path = pictureObject.get("picture_path").asString
-                            println(picture_path)
+                    val categoriesArray = response.body()?.getAsJsonArray("queryset")
+                    if (categoriesArray != null && categoriesArray.size() > 0) {
+                        var loadedCategories = 0
+                        for (i in 0 until categoriesArray.size()) {
+                            val categoryObject = categoriesArray[i].asJsonObject
+                            val picture_path = categoryObject.get("picture_path").asString
+                            val name = categoryObject.get("name").asString
                             ClientNetwork.retrofit.image(picture_path).enqueue(object :
                                 Callback<ResponseBody> {
                                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                                     if(response.isSuccessful) {
                                         if (response.body()!=null) {
                                             val picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                            imageList.put(i,picture)
-                                            loadedImages++
-                                            if (loadedImages == picturesArray.size())
+                                            categoriesList.put(name,picture)
+                                            loadedCategories++
+                                            if (loadedCategories == categoriesArray.size())
                                                 binding.recyclerView.adapter?.notifyDataSetChanged()
                                         }
                                     }

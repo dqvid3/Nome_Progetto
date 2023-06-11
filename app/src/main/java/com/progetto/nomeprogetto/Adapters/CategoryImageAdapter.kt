@@ -2,34 +2,35 @@ package com.progetto.nomeprogetto.Adapters
 
 import android.graphics.Bitmap
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.progetto.nomeprogetto.databinding.ProductImageViewDesignBinding
+import com.progetto.nomeprogetto.databinding.CategoryImageViewDesignBinding
 
-class ProductImageAdapter(private var imageList: HashMap<Int,Bitmap>) : RecyclerView.Adapter<ProductImageAdapter.ViewHolder>() {
+class CategoryImageAdapter(private var categoriesList: HashMap<String,Bitmap>) : RecyclerView.Adapter<CategoryImageAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 
-    class ViewHolder(binding: ProductImageViewDesignBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(binding: CategoryImageViewDesignBinding) : RecyclerView.ViewHolder(binding.root) {
         val imageView = binding.imageView
+        val categoryName = binding.categoryName
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = ProductImageViewDesignBinding.inflate(
+        val view = CategoryImageViewDesignBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         return ViewHolder(view)
     }
 
     override fun getItemCount(): Int {
-        return imageList.size
+        return categoriesList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val image = imageList[position]
+        val categoryName = categoriesList.keys.toList()[position]
 
-        holder.imageView.setImageBitmap(image)
+        holder.categoryName.text = categoryName
+        holder.imageView.setImageBitmap(categoriesList[categoryName])
 
         holder.itemView.setOnClickListener {
             onClickListener?.onClick()
