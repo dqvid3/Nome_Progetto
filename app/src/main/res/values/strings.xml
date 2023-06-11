@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">Nome Progetto</string>
     <string name="preference_file_key">com.example.myapp.PREFERENCE_FILE_KEY</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
