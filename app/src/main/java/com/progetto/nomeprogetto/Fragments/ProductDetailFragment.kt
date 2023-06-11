@@ -83,7 +83,7 @@ class ProductDetailFragment : Fragment() {
         binding.spinnerQty.adapter = adapter
 
         binding.backButton.setOnClickListener{
-            parentFragmentManager.findFragmentByTag("HomeFragment")?.let { it ->
+            parentFragmentManager.findFragmentByTag("ProductFragment")?.let { it ->
                 parentFragmentManager.beginTransaction()
                     .remove(this)
                     .show(it)
