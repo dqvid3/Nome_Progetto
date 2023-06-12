@@ -3,15 +3,13 @@ package com.progetto.nomeprogetto.Activities
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Menu
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.progetto.nomeprogetto.Adapters.ProductAdapter
-import com.progetto.nomeprogetto.Fragments.*
-import com.progetto.nomeprogetto.Objects.Product
+import com.progetto.nomeprogetto.Fragments.MainActivity.*
+import com.progetto.nomeprogetto.Fragments.MainActivity.Home.HomeFragment
+import com.progetto.nomeprogetto.Fragments.MainActivity.Home.ProductFragment
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.ActivityMainBinding
 
@@ -64,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     if(binding.homeFragmentHomeContainer.visibility==View.VISIBLE){
                         supportFragmentManager.beginTransaction()
-                            .replace(binding.homeFragmentHomeContainer.id,HomeFragment())
+                            .replace(binding.homeFragmentHomeContainer.id, HomeFragment())
                             .commit()
                         binding.searchView.setQuery("",false)
                     }else {
@@ -76,18 +74,22 @@ class MainActivity : AppCompatActivity() {
                             }
                         binding.homeFragmentHomeContainer.visibility = View.VISIBLE
                     }
+                    binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 R.id.navigation_cart -> {
                     openFragment(CartFragment())
+                    binding.searchView.visibility = View.GONE
                     true
                 }
                 R.id.navigation_account -> {
                     openFragment(AccountFragment())
+                    binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 R.id.navigation_settings -> {
                     openFragment(SettingsFragment())
+                    binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 else -> false

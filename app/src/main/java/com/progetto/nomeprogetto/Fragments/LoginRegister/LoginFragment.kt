@@ -1,4 +1,4 @@
-package com.progetto.nomeprogetto.Fragments
+package com.progetto.nomeprogetto.Fragments.LoginRegister
 
 import android.content.Context
 import android.content.Intent
@@ -46,9 +46,12 @@ class LoginFragment : Fragment() {
             object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                     if (response.isSuccessful) {
-                        if ((response.body()?.get("queryset") as JsonArray).size() == 1) {
+                        val user = response.body()?.get("queryset") as JsonArray
+                        if (user.size() == 1) {
                             val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-                            sharedPref.edit().putBoolean("IS_LOGGED_IN", true).apply()
+                            sharedPref.edit().putBoolean("IS_LOGGED_IN", true)
+                                .putInt("ID",user[0].asJsonObject.get("id").asInt)
+                                .apply()
                             startActivity(Intent(requireContext(), MainActivity::class.java))
                             requireActivity().finish()
                         } else {

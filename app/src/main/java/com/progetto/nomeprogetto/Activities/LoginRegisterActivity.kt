@@ -2,7 +2,7 @@ package com.progetto.nomeprogetto.Activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.progetto.nomeprogetto.Fragments.LoginFragment
+import com.progetto.nomeprogetto.Fragments.LoginRegister.LoginFragment
 import com.progetto.nomeprogetto.databinding.ActivityLoginRegisterBinding
 
 class LoginRegisterActivity : AppCompatActivity() {
@@ -15,7 +15,7 @@ class LoginRegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportFragmentManager.beginTransaction()
-            .replace(binding.fragmentLoginContainer.id,LoginFragment())
+            .replace(binding.fragmentLoginContainer.id, LoginFragment())
             .commit()
     }
 }

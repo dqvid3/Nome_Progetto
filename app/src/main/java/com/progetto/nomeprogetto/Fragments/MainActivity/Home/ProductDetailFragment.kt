@@ -1,6 +1,5 @@
-package com.progetto.nomeprogetto.Fragments
+package com.progetto.nomeprogetto.Fragments.MainActivity.Home
 
-import android.app.Dialog
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -13,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.ProductImageAdapter
 import com.progetto.nomeprogetto.Adapters.ProductReviewAdapter
@@ -72,6 +72,8 @@ class ProductDetailFragment : Fragment() {
         })
 
         binding.recyclerReviewsView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecoration = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
+        binding.recyclerReviewsView.addItemDecoration(itemDecoration)
         val reviewList = ArrayList<ProductReview>()
         setReviews(product?.id,reviewList)
         val reviewAdapter = ProductReviewAdapter(reviewList)
@@ -83,12 +85,21 @@ class ProductDetailFragment : Fragment() {
         binding.spinnerQty.adapter = adapter
 
         binding.backButton.setOnClickListener{
-            parentFragmentManager.findFragmentByTag("ProductFragment")?.let { it ->
+            val productFragment = parentFragmentManager.findFragmentByTag("ProductFragment")
+            if(productFragment != null){
                 parentFragmentManager.beginTransaction()
                     .remove(this)
-                    .show(it)
+                    .show(productFragment)
+                    .commit()
+            }else{ // sto aprendo il prodotto dalle novità
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.home_fragment_home_container, HomeFragment())
                     .commit()
             }
+        }
+
+        binding.addToCart.setOnClickListener{
+            println(binding.spinnerQty.selectedItem.toString())
         }
 
         binding.productName.text = product.name

@@ -1,4 +1,4 @@
-package com.progetto.nomeprogetto.Fragments
+package com.progetto.nomeprogetto.Fragments.MainActivity
 
 import android.app.Activity
 import android.content.Context
@@ -39,7 +39,7 @@ class AccountFragment : Fragment() {
         binding.logoutButton.setOnClickListener{
             val sharedPref = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             val editor = sharedPref.edit()
-            editor.putBoolean("IS_LOGGED_IN", false)
+            editor.putBoolean("IS_LOGGED_IN", false).putInt("ID",-1)
             editor.apply()
             val i = Intent(requireContext(), LoginRegisterActivity::class.java)
             startActivity(i)

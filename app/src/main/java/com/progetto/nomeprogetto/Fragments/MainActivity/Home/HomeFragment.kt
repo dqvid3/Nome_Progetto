@@ -1,21 +1,22 @@
-package com.progetto.nomeprogetto.Fragments
+package com.progetto.nomeprogetto.Fragments.MainActivity.Home
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.JsonObject
+import com.progetto.nomeprogetto.Adapters.CategoryImageAdapter
 import com.progetto.nomeprogetto.Adapters.ProductAdapter
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Objects.Product
 import com.progetto.nomeprogetto.R
-import com.progetto.nomeprogetto.databinding.FragmentProductBinding
+import com.progetto.nomeprogetto.databinding.FragmentHomeBinding
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,50 +24,92 @@ import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class ProductFragment : Fragment() {
+class HomeFragment : Fragment() {
 
-    private lateinit var binding: FragmentProductBinding
+    private lateinit var binding: FragmentHomeBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentProductBinding.inflate(inflater)
+        binding = FragmentHomeBinding.inflate(inflater)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val itemDecoration = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
-        binding.recyclerView.addItemDecoration(itemDecoration)
-        val productList = ArrayList<Product>()
-        val adapter = ProductAdapter(productList)
-        binding.recyclerView.adapter = adapter
-        arguments?.getString("searchQuery")?.let { setProducts(it,productList) }
+        binding.recyclerViewCategory.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+        val categoriesList = HashMap<String,Bitmap>()
+        setCategories(categoriesList)
+        val imageAdapter = CategoryImageAdapter(categoriesList)
+        binding.recyclerViewCategory.adapter = imageAdapter
+        imageAdapter.setOnClickListener(object: CategoryImageAdapter.OnClickListener{
+            override fun onClick() {
+                //cerca per categoria cliccata
+            }
+        })
 
-        adapter.setOnClickListener(object: ProductAdapter.OnClickListener{
+        binding.recyclerViewNews.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+        val newProducts = ArrayList<Product>()
+        setProducts(newProducts)
+        val productAdapter = ProductAdapter(newProducts)
+        binding.recyclerViewNews.adapter = productAdapter
+        productAdapter.setOnClickListener(object: ProductAdapter.OnClickListener{
             override fun onClick(product: Product) {
                 val bundle = Bundle()
                 bundle.putParcelable("product", product)
                 val productDetailFragment = ProductDetailFragment()
                 productDetailFragment.arguments = bundle
-                parentFragmentManager.beginTransaction().hide(this@ProductFragment)
+                parentFragmentManager.beginTransaction().hide(this@HomeFragment)
                     .add(R.id.home_fragment_home_container,productDetailFragment)
                     .commit()
             }
         })
 
-        /*binding.sortButton.setOnClickListener{
-            showSortOptions(binding.sortButton,productList)
-        }*/
-
         return binding.root
     }
 
-    private fun setProducts(productSearched: String, productList: ArrayList<Product>){
-        productList.clear()
+    private fun setCategories(categoriesList: HashMap<String,Bitmap>){
+        val query = "SELECT name,picture_path FROM categories"
+
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val categoriesArray = response.body()?.getAsJsonArray("queryset")
+                    if (categoriesArray != null && categoriesArray.size() > 0) {
+                        var loadedCategories = 0
+                        for (i in 0 until categoriesArray.size()) {
+                            val categoryObject = categoriesArray[i].asJsonObject
+                            val picture_path = categoryObject.get("picture_path").asString
+                            val name = categoryObject.get("name").asString
+                            ClientNetwork.retrofit.image(picture_path).enqueue(object :
+                                Callback<ResponseBody> {
+                                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                                    if(response.isSuccessful) {
+                                        if (response.body()!=null) {
+                                            val picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                            categoriesList.put(name,picture)
+                                            loadedCategories++
+                                            if (loadedCategories == categoriesArray.size())
+                                                binding.recyclerViewCategory.adapter?.notifyDataSetChanged()
+                                        }
+                                    }
+                                }
+                                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                                    Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+    private fun setProducts(productList: ArrayList<Product>){
 
         val query = "SELECT id,name,description,price,width,height,length,stock,main_picture_path,upload_date,\n" +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
-                "FROM products p WHERE REPLACE(LOWER(p.name), ' ', '') LIKE REPLACE(LOWER('%$productSearched%'), ' ', '');"
+                "FROM products p ORDER BY upload_date DESC LIMIT 20;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -100,7 +143,7 @@ class ProductFragment : Fragment() {
                                             productList.add(product)
                                             loadedProducts++
                                             if(loadedProducts==productsArray.size())
-                                                binding.recyclerView.adapter?.notifyDataSetChanged()
+                                                binding.recyclerViewNews.adapter?.notifyDataSetChanged()
                                         }
                                     }
                                 }
@@ -116,46 +159,5 @@ class ProductFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
             }
         })
-    }
-
-    private fun showSortOptions(anchorView: View,productList: ArrayList<Product>) {
-        val popupMenu = PopupMenu(requireContext(), anchorView)
-        popupMenu.menuInflater.inflate(R.menu.sort_options, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.lowest_price -> {
-                    productList.sortBy { it.price }
-                    binding.recyclerView.adapter?.notifyDataSetChanged()
-                    true
-                }
-                R.id.highest_price -> {
-                    productList.sortByDescending { it.price }
-                    binding.recyclerView.adapter?.notifyDataSetChanged()
-                    true
-                }
-                R.id.most_recent -> {
-                    productList.sortByDescending { it.uploadDate }
-                    binding.recyclerView.adapter?.notifyDataSetChanged()
-                    true
-                }
-                R.id.least_recent -> {
-                    productList.sortBy { it.uploadDate }
-                    binding.recyclerView.adapter?.notifyDataSetChanged()
-                    true
-                }
-                R.id.highest_rating -> {
-                    productList.sortByDescending { it.avgRating }
-                    binding.recyclerView.adapter?.notifyDataSetChanged()
-                    true
-                }
-                R.id.lowest_rating -> {
-                    productList.sortBy { it.avgRating }
-                    binding.recyclerView.adapter?.notifyDataSetChanged()
-                    true
-                }
-                else -> false
-            }
-        }
-        popupMenu.show()
     }
 }
