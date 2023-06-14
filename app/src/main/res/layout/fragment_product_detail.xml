@@ -83,7 +83,7 @@
                     android:text="Aggiungi al carrello" />
 
             </LinearLayout>
-
+<!---->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerColorView"
                 android:layout_width="wrap_content"
