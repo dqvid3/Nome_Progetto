@@ -152,7 +152,7 @@ class HomeFragment : Fragment() {
                                                 binding.recyclerViewNews.adapter?.notifyDataSetChanged()
                                         }
                                     }
-                                }
+                                }//
                                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                                     Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
                                 }

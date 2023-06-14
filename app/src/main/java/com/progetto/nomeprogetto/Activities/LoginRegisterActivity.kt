@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.progetto.nomeprogetto.Fragments.LoginRegister.LoginFragment
 import com.progetto.nomeprogetto.databinding.ActivityLoginRegisterBinding
-
+//
 class LoginRegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginRegisterBinding

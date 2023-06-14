@@ -2,10 +2,8 @@ package com.progetto.nomeprogetto.Adapters
 
 import android.graphics.Bitmap
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.progetto.nomeprogetto.Objects.ProductImage
 import com.progetto.nomeprogetto.databinding.ProductImageViewDesignBinding
 
 class ProductImageAdapter(private var imageList: HashMap<Int,Bitmap>) : RecyclerView.Adapter<ProductImageAdapter.ViewHolder>() {
@@ -22,7 +20,7 @@ class ProductImageAdapter(private var imageList: HashMap<Int,Bitmap>) : Recycler
         )
         return ViewHolder(view)
     }
-
+//
     override fun getItemCount(): Int {
         return imageList.size
     }

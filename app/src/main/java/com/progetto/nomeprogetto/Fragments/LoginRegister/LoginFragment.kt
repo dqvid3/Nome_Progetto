@@ -31,7 +31,7 @@ class LoginFragment : Fragment() {
         binding.loginButton.setOnClickListener{
             loginUser(binding.editTextEmail.text.toString(),binding.editTextPassword.text.toString())
         }
-
+//
         binding.registerTextView.setOnClickListener{
             openFragment(RegisterFragment())
         }

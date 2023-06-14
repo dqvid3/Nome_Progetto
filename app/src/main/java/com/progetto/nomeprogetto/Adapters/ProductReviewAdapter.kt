@@ -14,7 +14,7 @@ class ProductReviewAdapter(private var reviewList: List<ProductReview>) : Recycl
         val reviewComment = binding.reviewComment
         val reviewDate = binding.reviewDate
     }
-
+//
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = ReviewViewDesignBinding.inflate(
             LayoutInflater.from(parent.context), parent, false

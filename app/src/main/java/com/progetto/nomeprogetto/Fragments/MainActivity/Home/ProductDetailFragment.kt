@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.ProductColorAdapter
@@ -21,7 +20,6 @@ import com.progetto.nomeprogetto.Adapters.ProductReviewAdapter
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Objects.Product
 import com.progetto.nomeprogetto.Objects.ProductColor
-import com.progetto.nomeprogetto.Objects.ProductImage
 import com.progetto.nomeprogetto.Objects.ProductReview
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.FragmentProductDetailBinding
@@ -148,7 +146,7 @@ class ProductDetailFragment : Fragment() {
                             if(i==0){
                                 setImages(productId, imageList,color_id)
                                 qty = stock
-                            }
+                            }//
                             loadedColors++
                             if(loadedColors==colorsArray.size())
                                 binding.recyclerColorView.adapter?.notifyDataSetChanged()
