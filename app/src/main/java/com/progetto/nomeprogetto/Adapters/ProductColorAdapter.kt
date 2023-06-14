@@ -34,7 +34,7 @@ class ProductColorAdapter(private var colorList: ArrayList<ProductColor>) : Recy
         )
         return ViewHolder(view)
     }
-//
+
     override fun getItemCount(): Int {
         return colorList.size
     }

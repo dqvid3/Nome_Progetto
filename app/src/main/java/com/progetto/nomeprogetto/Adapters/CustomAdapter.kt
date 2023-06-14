@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.progetto.nomeprogetto.Objects.ItemViewModel
 import com.progetto.nomeprogetto.databinding.CardViewDesignBinding
-//
+
 class CustomAdapter(private var mList: List<ItemViewModel>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>(){
 
     private var onClickListener: OnClickListener? = null

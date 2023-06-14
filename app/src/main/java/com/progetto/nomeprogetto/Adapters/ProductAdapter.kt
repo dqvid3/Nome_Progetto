@@ -29,7 +29,7 @@ class ProductAdapter(private var productList: List<Product>) : RecyclerView.Adap
     override fun getItemCount(): Int {
         return productList.size
     }
-//
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val product = productList[position]
 

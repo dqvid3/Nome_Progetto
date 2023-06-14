@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.progetto.nomeprogetto.databinding.CategoryImageViewDesignBinding
-//
+
 class CategoryImageAdapter(private var categoriesList: HashMap<String,Bitmap>) : RecyclerView.Adapter<CategoryImageAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null

@@ -12,7 +12,7 @@ import com.progetto.nomeprogetto.Fragments.MainActivity.Home.HomeFragment
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.ProductFragment
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.ActivityMainBinding
-//
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

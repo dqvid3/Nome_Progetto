@@ -78,7 +78,7 @@ class ProductFragment : Fragment() {
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
                 "FROM products p,categories c WHERE p.category_id = c.id and c.name='$productSearched';"
-//
+
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if (response.isSuccessful) {

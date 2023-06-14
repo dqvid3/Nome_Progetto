@@ -1,5 +1,4 @@
 package com.progetto.nomeprogetto.Objects
-//
 
 class User(
         val username: String,

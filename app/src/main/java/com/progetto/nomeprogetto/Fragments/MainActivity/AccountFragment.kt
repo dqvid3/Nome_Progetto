@@ -43,7 +43,7 @@ class AccountFragment : Fragment() {
             editor.apply()
             val i = Intent(requireContext(), LoginRegisterActivity::class.java)
             startActivity(i)
-//
+
             parentFragmentManager.beginTransaction()
                 .remove(this)
                 .commit()
@@ -57,4 +57,5 @@ class AccountFragment : Fragment() {
         }
 
         return binding.root
-    }}
+    }
+}

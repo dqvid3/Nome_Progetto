@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
-//
 @Parcelize
 class Product(
     val id: Int,
