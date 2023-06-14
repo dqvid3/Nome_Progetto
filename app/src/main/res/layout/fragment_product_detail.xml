@@ -61,12 +61,14 @@
                     android:id="@+id/add_to_wish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_heart"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:src="@drawable/ic_heart"
-                    android:layout_margin="15dp"
-                    app:tint="@android:color/darker_gray"
-                    android:background="@android:color/transparent"/>
+                    app:tint="@android:color/darker_gray" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -102,10 +104,12 @@
                     android:id="@+id/add_to_cart"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Aggiungi al carrello" />
+                    android:backgroundTint="@color/redPart"
+                    android:text="Aggiungi al carrello"
+                    app:cornerRadius="22dp" />
 
             </LinearLayout>
-
+<!---->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerColorView"
                 android:layout_width="wrap_content"
