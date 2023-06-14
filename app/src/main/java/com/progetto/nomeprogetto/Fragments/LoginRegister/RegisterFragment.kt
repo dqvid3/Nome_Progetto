@@ -2,7 +2,6 @@ package com.progetto.nomeprogetto.Fragments.LoginRegister
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,11 +12,9 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Activities.MainActivity
 import com.progetto.nomeprogetto.ClientNetwork
-import com.progetto.nomeprogetto.Fragments.LoginRegister.LoginFragment
 import com.progetto.nomeprogetto.Objects.User
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.FragmentRegisterBinding
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -49,9 +46,11 @@ class RegisterFragment : Fragment() {
                 Toast.makeText(requireContext(), "Perfavore riempi tutti i campi", Toast.LENGTH_SHORT).show()
             else{
                 userExists(email, username) {exists ->
-                    if(exists)
-                        Toast.makeText(requireContext(), "Username o email inserita già esistente", Toast.LENGTH_SHORT).show()
-                    else{
+                    if(exists==1)
+                        Toast.makeText(requireContext(), "Username inserito già esistente", Toast.LENGTH_SHORT).show()
+                    else if(exists==2)
+                        Toast.makeText(requireContext(), "Email inserita già esistente", Toast.LENGTH_SHORT).show()
+                    else if(exists==0){
                         val  user = User(username,name,surname,email,address,password)
                         registerUser(user)
                     }
@@ -62,21 +61,37 @@ class RegisterFragment : Fragment() {
         return binding.root
     }
 
-    private fun userExists(email: String, username: String, callback: (Boolean) -> Unit){
-        val query = "SELECT * FROM users WHERE username = '$username' OR email = '$email';"
+    private fun userExists(email: String, username: String, callback: (Int) -> Unit){
+        var query = "SELECT id FROM users WHERE username = '$username';"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if (response.isSuccessful) {
                     val resultSetSize = (response.body()?.get("queryset") as JsonArray).size()
-                    val exists = resultSetSize == 1
-                    callback(exists)
+                    if(resultSetSize==1) callback(1)
+                    else{ //se non esiste un utente con quell'username
+                        query = "SELECT id FROM users WHERE email = '$email';"
+                        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+                            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                                if (response.isSuccessful) {
+                                    val resultSetSize = (response.body()?.get("queryset") as JsonArray).size()
+                                    if(resultSetSize==1) callback(2)
+                                    else callback(0)
+                                } else
+                                    callback(-1)
+                            }
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                callback(-1)
+                            }
+                        })
+                    }
                 } else
-                    callback(false)
+                    callback(-1)
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                callback(false)
+                callback(-1)
             }
         })
     }

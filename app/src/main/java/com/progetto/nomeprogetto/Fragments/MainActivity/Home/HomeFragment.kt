@@ -1,5 +1,6 @@
 package com.progetto.nomeprogetto.Fragments.MainActivity.Home
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -40,8 +41,14 @@ class HomeFragment : Fragment() {
         val imageAdapter = CategoryImageAdapter(categoriesList)
         binding.recyclerViewCategory.adapter = imageAdapter
         imageAdapter.setOnClickListener(object: CategoryImageAdapter.OnClickListener{
-            override fun onClick() {
-                //cerca per categoria cliccata
+            override fun onClick(categoryName: String) {
+                val bundle = Bundle()
+                bundle.putString("category_name", categoryName)
+                val productFragment = ProductFragment()
+                productFragment.arguments = bundle
+                parentFragmentManager.beginTransaction().hide(this@HomeFragment)
+                    .add(R.id.home_fragment_home_container,productFragment)
+                    .commit()
             }
         })
 
@@ -106,10 +113,10 @@ class HomeFragment : Fragment() {
     }
     private fun setProducts(productList: ArrayList<Product>){
 
-        val query = "SELECT id,name,description,price,width,height,length,stock,main_picture_path,upload_date,\n" +
+        val query = "SELECT id,name,description,price,width,height,length,main_picture_path,upload_date,\n" +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
-                "FROM products p ORDER BY upload_date DESC LIMIT 20;"
+                "FROM products p WHERE upload_date >= DATE_SUB(NOW(), INTERVAL 7 DAY) ORDER BY upload_date DESC LIMIT 20;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -126,7 +133,6 @@ class HomeFragment : Fragment() {
                             val width = productObject.get("width").asDouble
                             val height = productObject.get("height").asDouble
                             val length = productObject.get("length").asDouble
-                            val stock = productObject.get("stock").asInt
                             val avgRating = productObject.get("avg_rating").asDouble
                             val reviewsNumber = productObject.get("review_count").asInt
                             val date = productObject.get("upload_date").asString
@@ -139,7 +145,7 @@ class HomeFragment : Fragment() {
                                     if(response.isSuccessful) {
                                         if (response.body()!=null) {
                                             val main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                            val product = Product(id, name, description, price,width,height,length,stock,main_picture,avgRating,reviewsNumber,uploadDate)
+                                            val product = Product(id, name, description, price,width,height,length,main_picture,avgRating,reviewsNumber,uploadDate)
                                             productList.add(product)
                                             loadedProducts++
                                             if(loadedProducts==productsArray.size())
@@ -152,7 +158,7 @@ class HomeFragment : Fragment() {
                                 }
                             })
                         }
-                    } else Toast.makeText(requireContext(), "Non è stato trovato nulla relativo al testo inserito", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {

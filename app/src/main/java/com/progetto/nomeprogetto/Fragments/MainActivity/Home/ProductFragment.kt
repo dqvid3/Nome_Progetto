@@ -39,7 +39,8 @@ class ProductFragment : Fragment() {
         val productList = ArrayList<Product>()
         val adapter = ProductAdapter(productList)
         binding.recyclerView.adapter = adapter
-        arguments?.getString("searchQuery")?.let { setProducts(it,productList) }
+        arguments?.getString("searchQuery")?.let { setProducts(it,productList,0) } // 0 query normale
+        arguments?.getString("category_name")?.let { setProducts(it,productList,1) } // 1 query per categoria
 
         adapter.setOnClickListener(object: ProductAdapter.OnClickListener{
             override fun onClick(product: Product) {
@@ -66,11 +67,17 @@ class ProductFragment : Fragment() {
         return binding.root
     }
 
-    private fun setProducts(productSearched: String, productList: ArrayList<Product>){
-        val query = "SELECT id,name,description,price,width,height,length,stock,main_picture_path,upload_date,\n" +
+    private fun setProducts(productSearched: String, productList: ArrayList<Product>,searchType: Int){
+        var query = ""
+        if(searchType==0)
+            query = "SELECT id,name,description,price,width,height,length,main_picture_path,upload_date,\n" +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
-                "FROM products p WHERE REPLACE(LOWER(p.name), ' ', '') LIKE REPLACE(LOWER('%$productSearched%'), ' ', '');"
+                "FROM products p WHERE LOWER(p.name) LIKE LOWER('%$productSearched%');"
+        else query = "SELECT p.id,p.name,p.description,price,width,height,length,main_picture_path,upload_date,\n" +
+                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
+                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
+                "FROM products p,categories c WHERE p.category_id = c.id and c.name='$productSearched';"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -87,7 +94,6 @@ class ProductFragment : Fragment() {
                             val width = productObject.get("width").asDouble
                             val height = productObject.get("height").asDouble
                             val length = productObject.get("length").asDouble
-                            val stock = productObject.get("stock").asInt
                             val avgRating = productObject.get("avg_rating").asDouble
                             val reviewsNumber = productObject.get("review_count").asInt
                             val date = productObject.get("upload_date").asString
@@ -100,8 +106,10 @@ class ProductFragment : Fragment() {
                                     if(response.isSuccessful) {
                                         if (response.body()!=null) {
                                             val main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                            val product = Product(id, name, description, price,width,height,length,stock,main_picture,avgRating,reviewsNumber,uploadDate)
+                                            val product = Product(id, name, description, price,width,height,length,main_picture
+                                                ,avgRating,reviewsNumber,uploadDate)
                                             productList.add(product)
+                                            println(main_picture_path)
                                             loadedProducts++
                                             if(loadedProducts==productsArray.size())
                                                 binding.recyclerView.adapter?.notifyDataSetChanged()
@@ -113,7 +121,12 @@ class ProductFragment : Fragment() {
                                 }
                             })
                         }
-                    } else Toast.makeText(requireContext(), "Non è stato trovato nulla relativo al testo inserito", Toast.LENGTH_LONG).show()
+                    } else{
+                        if(searchType==0)
+                            Toast.makeText(requireContext(), "Non è stato trovato nulla relativo al testo inserito", Toast.LENGTH_LONG).show()
+                        else
+                            Toast.makeText(requireContext(), "Non è stato trovato nulla relativo alla categoria selezionata", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {

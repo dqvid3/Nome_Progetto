@@ -14,7 +14,6 @@ class Product(
     val width: Double,
     val height: Double,
     val length: Double,
-    val stock: Int,
     val main_picture: Bitmap?,
     val avgRating: Double,
     val reviewsNumber: Int,

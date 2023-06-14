@@ -33,12 +33,12 @@ class CategoryImageAdapter(private var categoriesList: HashMap<String,Bitmap>) :
         holder.imageView.setImageBitmap(categoriesList[categoryName])
 
         holder.itemView.setOnClickListener {
-            onClickListener?.onClick()
+            onClickListener?.onClick(categoryName)
         }
     }
 
     interface OnClickListener {
-        fun onClick()
+        fun onClick(categoryName: String)
     }
 
     fun setOnClickListener(onClickListener: OnClickListener) {
