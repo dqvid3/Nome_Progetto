@@ -14,22 +14,23 @@
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
+            android:layout_weight="1"
+            android:background="@color/redPart"
             android:scaleType="center"
             android:src="@drawable/ic_arrow_back"
-            app:tint="@color/blackPart" />
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/product_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="4"
+            android:background="@color/redPart"
             android:paddingHorizontal="10dp"
             android:paddingVertical="5dp"
             android:text="Product Name"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -50,8 +51,8 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerImageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -85,14 +86,16 @@
                     android:layout_gravity="center"
                     android:layout_marginHorizontal="10dp"
                     android:text="Prezzo"
+                    android:textColor="@color/redPart"
                     android:textSize="18dp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:text="Quantità: "
-                    android:layout_gravity="center"/>
+                    android:textColor="@color/black" />
 
                 <Spinner
                     android:id="@+id/spinner_qty"
