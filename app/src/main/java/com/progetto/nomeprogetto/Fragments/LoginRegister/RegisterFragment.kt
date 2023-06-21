@@ -107,7 +107,7 @@ class RegisterFragment : Fragment() {
                     Toast.makeText(requireContext(), "Registrazione avvenuta con successo",Toast.LENGTH_SHORT).show()
                     val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
                     sharedPref.edit().putBoolean("IS_LOGGED_IN", true).apply()
-                    createCart(user.email)
+                    //createCart(user.email)
                     startActivity(Intent(requireContext(), MainActivity::class.java))
                     requireActivity().finish()
                 }else Toast.makeText(requireContext(), "Errore nell'effettuare la registrazione, riprova",Toast.LENGTH_SHORT).show()
@@ -118,7 +118,7 @@ class RegisterFragment : Fragment() {
         })
     }
 
-    private fun createCart(email: String){
+    /*private fun createCart(email: String){
         var query = "SELECT id FROM users WHERE email = '$email';"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
@@ -144,5 +144,5 @@ class RegisterFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
             }
         })
-    }
+    }*/
 }

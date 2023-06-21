@@ -16,5 +16,11 @@ class Product(
     val main_picture: Bitmap?,
     val avgRating: Double,
     val reviewsNumber: Int,
-    val uploadDate: LocalDateTime
+    val uploadDate: LocalDateTime,
+    //per il carrello:
+    val itemId: Int? = null,
+    val colorName: String? = null,
+    val color_hex: String? = null,
+    val quantity: Int? = null,
+    val stock: Int? = null
 ) : Parcelable

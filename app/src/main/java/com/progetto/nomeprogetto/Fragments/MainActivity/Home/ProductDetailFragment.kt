@@ -1,7 +1,11 @@
 package com.progetto.nomeprogetto.Fragments.MainActivity.Home
 
+import android.content.Context
+import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +19,7 @@ import androidx.recyclerview.widget.LinearSnapHelper
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.JsonObject
+import com.progetto.nomeprogetto.Activities.MainActivity
 import com.progetto.nomeprogetto.Adapters.ProductColorAdapter
 import com.progetto.nomeprogetto.Adapters.ProductImageAdapter
 import com.progetto.nomeprogetto.Adapters.ProductReviewAdapter
@@ -22,6 +27,7 @@ import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Objects.Product
 import com.progetto.nomeprogetto.Objects.ProductColor
 import com.progetto.nomeprogetto.Objects.ProductReview
+import com.progetto.nomeprogetto.Objects.User
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.FragmentProductDetailBinding
 import okhttp3.ResponseBody
@@ -36,7 +42,8 @@ class ProductDetailFragment : Fragment() {
     private lateinit var binding: FragmentProductDetailBinding
     private var imageSelected: Boolean = false
     private var colorSelected: Int = -1
-    private var qty: Int = 0
+    private var currentStock: Int = -1
+    private var addToWish = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,23 +100,27 @@ class ProductDetailFragment : Fragment() {
         colorAdapter.setOnClickListener(object : ProductColorAdapter.OnClickListener {
             override fun onClick(position: Int) {
                 val prevPos = colorAdapter.getPosition()
-                colorAdapter.setColor(colorList.get(position).color_id)
+                colorSelected = colorList.get(position).color_id
+                currentStock = colorList.get(position).stock
+                colorAdapter.setColor(colorSelected)
                 colorAdapter.notifyItemChanged(position)
                 colorAdapter.notifyItemChanged(prevPos)
-                colorSelected = colorList.get(position).color_id
                 setImages(product?.id, imageList, colorSelected)
+                val quantityOptions = (1..currentStock).toList()
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, quantityOptions)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerQty.adapter = adapter
             }
         })
 
-        val quantityOptions = (1..qty).toList()
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, quantityOptions)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerQty.adapter = adapter
-
         binding.backButton.setOnClickListener {
             val productFragment = parentFragmentManager.findFragmentByTag("ProductFragment")
+            val cartFragment = parentFragmentManager.findFragmentByTag("CartFragment")
             if (productFragment != null)
                 parentFragmentManager.beginTransaction().remove(this).show(productFragment)
+                    .commit()
+            else if (cartFragment != null)
+                parentFragmentManager.beginTransaction().remove(this).show(cartFragment)
                     .commit()
             else // sto aprendo il prodotto dalle novità
                 parentFragmentManager.beginTransaction().replace(R.id.home_fragment_home_container, HomeFragment())
@@ -117,7 +128,20 @@ class ProductDetailFragment : Fragment() {
         }
 
         binding.addToCart.setOnClickListener {
-            println(binding.spinnerQty.selectedItem.toString())
+            val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            val userId = sharedPref.getInt("ID", 0)
+            val qty = binding.spinnerQty.selectedItem.toString().toInt()
+            addToCart(userId,product?.id,qty,colorSelected)
+        }
+
+        binding.addToWish.setOnClickListener{
+            if(!addToWish) {
+                binding.addToWish.imageTintList = ColorStateList.valueOf(Color.RED)
+                addToWish = true
+            }else{
+                binding.addToWish.imageTintList = ColorStateList.valueOf(Color.GRAY)
+                addToWish = false
+            }
         }
 
         binding.productName.text = product?.name
@@ -125,6 +149,61 @@ class ProductDetailFragment : Fragment() {
         binding.productPrice.text = product?.price.toString() + " €"
 
         return binding.root
+    }
+
+    private fun addToCart(userId: Int?,productId: Int?,qty: Int,colorId: Int){
+        var query = "SELECT id,quantity from cart_items where user_id=$userId and product_id=$productId and color_id=$colorId;"
+
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val itemsArray = response.body()?.getAsJsonArray("queryset")
+                    if (itemsArray != null && itemsArray.size() > 0) {
+                        val itemObject = itemsArray[0].asJsonObject
+                        val quantity = itemObject.get("quantity").asInt
+                        val itemId = itemObject.get("id").asInt
+                        // se l'utente prova a mettere più oggetti di quanto ne siano disponibili
+                        if(quantity+qty>currentStock)
+                            Toast.makeText(requireContext(), "Non puoi inserire più della quantità disponibile per prodotto", Toast.LENGTH_LONG).show()
+                        else{
+                            query = "UPDATE cart_items set quantity=${quantity+qty} where id=$itemId"
+
+                            ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
+                                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                                    if(response.isSuccessful)
+                                        Toast.makeText(requireContext(), "Articoli aggiunti al carrello $qty",Toast.LENGTH_SHORT).show()
+                                    else
+                                        Toast.makeText(requireContext(), "Errore nell'inserimento dell'articolo, riprova",Toast.LENGTH_SHORT).show()
+                                }
+                                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                                    Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                }
+                            })
+                        }
+                    }else{ //se non esiste nel carrello lo aggiungo
+                        query = "INSERT INTO cart_items (user_id,product_id,quantity,color_id)" +
+                                    " VALUES ($userId,$productId,$qty,$colorId);"
+
+                        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
+                            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                                if (response.isSuccessful)
+                                    Toast.makeText(requireContext(), "Articoli aggiunti al carrello $qty", Toast.LENGTH_SHORT).show()
+                                else
+                                    Toast.makeText(requireContext(), "Errore nell'inserimento dell'articolo, riprova", Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                            }
+                        })
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     private fun setColors(productId: Int?,colorList: ArrayList<ProductColor>,imageList: HashMap<Int, Bitmap>){
@@ -145,8 +224,13 @@ class ProductDetailFragment : Fragment() {
                             val stock = colorObject.get("stock").asInt
                             colorList.add(ProductColor(colorName,color_id,colorHex,stock))
                             if(i==0){
-                                setImages(productId, imageList,color_id)
-                                qty = stock
+                                currentStock = stock
+                                colorSelected = color_id
+                                setImages(productId, imageList,colorSelected)
+                                val quantityOptions = (1..stock).toList()
+                                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, quantityOptions)
+                                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                binding.spinnerQty.adapter = adapter
                             }
                             loadedColors++
                             if(loadedColors==colorsArray.size())
@@ -182,9 +266,7 @@ class ProductDetailFragment : Fragment() {
                                     ) {
                                         if (response.isSuccessful) {
                                             if (response.body() != null) {
-                                                val picture = BitmapFactory.decodeStream(
-                                                    response.body()?.byteStream()
-                                                )
+                                                val picture = BitmapFactory.decodeStream(response.body()?.byteStream())
                                                 imageList[pictureIndex] = picture
                                                 loadedImages++
                                                 if (loadedImages == picturesArray.size())

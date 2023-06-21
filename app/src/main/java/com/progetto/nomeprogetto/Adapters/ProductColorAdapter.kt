@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.progetto.nomeprogetto.Objects.ProductColor
+import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.ProductColorViewDesignBinding
 
 class ProductColorAdapter(private var colorList: ArrayList<ProductColor>) : RecyclerView.Adapter<ProductColorAdapter.ViewHolder>() {
@@ -46,7 +47,7 @@ class ProductColorAdapter(private var colorList: ArrayList<ProductColor>) : Recy
         holder.colorView.backgroundTintList = ColorStateList.valueOf(Color.parseColor(color.hex))
         if(color.color_id == colorSelected) {
             positionSelected = position
-            holder.colorView.strokeColor = Color.BLUE
+            holder.colorView.strokeColor = Color.CYAN
         }else
             holder.colorView.strokeColor = Color.TRANSPARENT
 

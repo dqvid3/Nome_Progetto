@@ -49,7 +49,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFragment(fragment: Fragment){
-        supportFragmentManager.beginTransaction()
+        if(fragment is CartFragment)
+            supportFragmentManager.beginTransaction()
+                .replace(binding.homeFragmentContainer.id, fragment, "CartFragment")
+                .commit()
+        else
+            supportFragmentManager.beginTransaction()
             .replace(binding.homeFragmentContainer.id, fragment)
             .commit()
         binding.homeFragmentHomeContainer.visibility = View.GONE

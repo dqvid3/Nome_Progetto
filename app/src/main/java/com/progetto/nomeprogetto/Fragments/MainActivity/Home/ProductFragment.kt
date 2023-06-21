@@ -78,6 +78,7 @@ class ProductFragment : Fragment() {
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
                 "FROM products p,categories c WHERE p.category_id = c.id and c.name='$productSearched';"
+        val context = requireContext()
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -100,8 +101,7 @@ class ProductFragment : Fragment() {
                             val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
                             val uploadDate = LocalDateTime.parse(date, formatter)
                             val main_picture_path = productObject.get("main_picture_path").asString
-                            ClientNetwork.retrofit.image(main_picture_path).enqueue(object :
-                                Callback<ResponseBody> {
+                            ClientNetwork.retrofit.image(main_picture_path).enqueue(object : Callback<ResponseBody> {
                                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                                     if(response.isSuccessful) {
                                         if (response.body()!=null) {
@@ -109,7 +109,6 @@ class ProductFragment : Fragment() {
                                             val product = Product(id, name, description, price,width,height,length,main_picture
                                                 ,avgRating,reviewsNumber,uploadDate)
                                             productList.add(product)
-                                            println(main_picture_path)
                                             loadedProducts++
                                             if(loadedProducts==productsArray.size())
                                                 binding.recyclerView.adapter?.notifyDataSetChanged()
@@ -117,20 +116,20 @@ class ProductFragment : Fragment() {
                                     }
                                 }
                                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                                    Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
                                 }
                             })
                         }
                     } else{
                         if(searchType==0)
-                            Toast.makeText(requireContext(), "Non è stato trovato nulla relativo al testo inserito", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Non è stato trovato nulla relativo al testo inserito", Toast.LENGTH_LONG).show()
                         else
-                            Toast.makeText(requireContext(), "Non è stato trovato nulla relativo alla categoria selezionata", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Non è stato trovato nulla relativo alla categoria selezionata", Toast.LENGTH_LONG).show()
                     }
                 }
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
             }
         })
     }
