@@ -156,7 +156,7 @@ class ProductDetailFragment : Fragment() {
                         if(quantity+qty>currentStock)
                             Toast.makeText(requireContext(), "Non puoi inserire più della quantità disponibile per prodotto", Toast.LENGTH_LONG).show()
                         else{
-                            query = "UPDATE cart_items set quantity=${quantity+qty} where id=$itemId"
+                            query = "UPDATE cart_items set quantity=${quantity+qty} where id=$itemId;"
 
                             ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
                                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
