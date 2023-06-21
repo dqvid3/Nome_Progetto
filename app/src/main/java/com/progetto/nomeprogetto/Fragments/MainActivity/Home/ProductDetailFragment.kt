@@ -40,7 +40,6 @@ import java.time.format.DateTimeFormatter
 class ProductDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentProductDetailBinding
-    private var imageSelected: Boolean = false
     private var colorSelected: Int = -1
     private var currentStock: Int = -1
     private var addToWish = false
@@ -84,16 +83,7 @@ class ProductDetailFragment : Fragment() {
 
         imageAdapter.setOnClickListener(object : ProductImageAdapter.OnClickListener {
             override fun onClick() {
-                val layoutParams = binding.recyclerImageView.layoutParams
-                if (!imageSelected) {
-                    layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-                } else {
-                    layoutParams.height = resources.getDimensionPixelSize(R.dimen.recycler_view_height)
-                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-                }
-                imageSelected = !imageSelected
-                binding.recyclerImageView.layoutParams = layoutParams
+
             }
         })
 
