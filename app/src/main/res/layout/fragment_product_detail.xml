@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -57,27 +58,31 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageButton
-                    android:elevation="15dp"
-                    android:id="@+id/add_to_wish"
+                <Spinner
+                    android:id="@+id/spinner_qty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@android:color/transparent"
-                    android:src="@drawable/ic_heart"
+                    android:layout_gravity="center"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:tint="@android:color/darker_gray" />
+                    app:layout_constraintHorizontal_bias="0.706"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.954" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingVertical="5dp">
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Quantità: "
+                    android:textColor="@color/black"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.42"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.944" />
 
                 <TextView
                     android:id="@+id/product_price"
@@ -88,27 +93,41 @@
                     android:text="Prezzo"
                     android:textColor="@color/redPart"
                     android:textSize="18dp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.157"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.957" />
 
-                <TextView
+                <ImageButton
+                    android:id="@+id/add_to_wish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Quantità: "
-                    android:textColor="@color/black" />
+                    android:layout_margin="15dp"
+                    android:background="@android:color/transparent"
+                    android:elevation="15dp"
+                    android:src="@drawable/ic_heart"
+                    app:tint="@android:color/darker_gray"
+                    tools:layout_editor_absoluteX="373dp"
+                    tools:layout_editor_absoluteY="360dp" />
 
-                <Spinner
-                    android:id="@+id/spinner_qty"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="5dp">
 
                 <Button
                     android:id="@+id/add_to_cart"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="84dp"
                     android:backgroundTint="@color/redPart"
+                    android:drawableLeft="@drawable/ic_cart"
                     android:text="Aggiungi al carrello"
                     app:cornerRadius="22dp" />
 
