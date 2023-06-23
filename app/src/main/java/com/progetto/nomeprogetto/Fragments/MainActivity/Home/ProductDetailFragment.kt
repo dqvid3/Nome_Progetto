@@ -142,7 +142,7 @@ class ProductDetailFragment : Fragment() {
     }
 
     private fun addToCart(userId: Int?,productId: Int?,qty: Int,colorId: Int){
-        var query = "SELECT id,quantity from cart_items where user_id=$userId and product_id=$productId and color_id=$colorId;"
+        var query = "SELECT id,quantity from cart_items where user_id=$userId and color_id=$colorId;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -171,8 +171,8 @@ class ProductDetailFragment : Fragment() {
                             })
                         }
                     }else{ //se non esiste nel carrello lo aggiungo
-                        query = "INSERT INTO cart_items (user_id,product_id,quantity,color_id)" +
-                                    " VALUES ($userId,$productId,$qty,$colorId);"
+                        query = "INSERT INTO cart_items (user_id,quantity,color_id)" +
+                                    " VALUES ($userId,$qty,$colorId);"
 
                         ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
                             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
