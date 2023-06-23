@@ -9,12 +9,14 @@
 
     <ImageView
         android:id="@+id/splash_icon"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="319dp"
+        android:layout_height="394dp"
         android:layout_centerInParent="true"
-        android:layout_margin="25dp"
-        android:src="@drawable/ic_splash"
-        app:tint="@color/redPart"
-        android:scaleType="fitXY"/>
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_logo" />
 
 </RelativeLayout>
