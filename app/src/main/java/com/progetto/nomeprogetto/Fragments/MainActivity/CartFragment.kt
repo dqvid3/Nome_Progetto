@@ -13,6 +13,7 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.CartAdapter
+import com.progetto.nomeprogetto.Adapters.CartAdapterListener
 import com.progetto.nomeprogetto.Adapters.ProductAdapter
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.ProductDetailFragment
@@ -26,7 +27,12 @@ import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class CartFragment : Fragment() {
+class CartFragment : Fragment(), CartAdapterListener {
+
+    override fun restoreCart() {
+        binding.emptyCart.visibility = View.VISIBLE
+        binding.recyclerView.visibility = View.GONE
+    }
 
     private lateinit var binding: FragmentCartBinding
 
@@ -35,9 +41,7 @@ class CartFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCartBinding.inflate(inflater)
-
         loadCart()
-
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val position = tab?.position
@@ -58,7 +62,7 @@ class CartFragment : Fragment() {
         val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         val userId = sharedPref.getInt("ID", 0)
         val productList = ArrayList<Product>()
-        val adapter = CartAdapter(productList,userId)
+        val adapter = CartAdapter(productList,this)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecoration = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
@@ -121,8 +125,11 @@ class CartFragment : Fragment() {
                                                 ,avgRating,reviewsNumber,uploadDate,itemId,color,color_hex,quantity,stock)
                                             productList.add(product)
                                             loadedProducts++
-                                            if(loadedProducts==productsArray.size())
+                                            if(loadedProducts==productsArray.size()) {
+                                                binding.emptyCart.visibility = View.GONE
+                                                binding.recyclerView.visibility = View.VISIBLE
                                                 binding.recyclerView.adapter?.notifyDataSetChanged()
+                                            }
                                         }
                                     }
                                 }
@@ -131,7 +138,7 @@ class CartFragment : Fragment() {
                                 }
                             })
                         }
-                    } else Toast.makeText(requireContext(), "Non hai nessun articolo all'interno del carrello", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {

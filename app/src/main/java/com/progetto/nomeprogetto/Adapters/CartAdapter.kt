@@ -1,6 +1,7 @@
 package com.progetto.nomeprogetto.Adapters
 
 import android.R
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -18,7 +19,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CartAdapter(private var productList: List<Product>,val userId: Int) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+class CartAdapter(private var productList: List<Product>,private val listener: CartAdapterListener) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 
@@ -29,6 +30,7 @@ class CartAdapter(private var productList: List<Product>,val userId: Int) : Recy
         val spinnerQty = binding.spinnerQty
         val colorName = binding.colorName
         val colorView = binding.colorView
+        val removeProduct = binding.removeProduct
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,12 +59,19 @@ class CartAdapter(private var productList: List<Product>,val userId: Int) : Recy
         holder.spinnerQty.adapter = adapter
         holder.spinnerQty.setSelection(product.quantity!!-1)
         holder.spinnerQty.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            var isInitialSelection = true
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                if(isInitialSelection){
+                    isInitialSelection = false
+                    return
+                }
                 val selectedQuantity = quantityOptions[position]
-                updateCart(product.itemId!!,selectedQuantity)
+                product.itemId?.let { updateCart(it,selectedQuantity,holder.itemView.context) }
             }
-
             override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+        holder.removeProduct.setOnClickListener{
+            product.itemId?.let { removeFromCart(it,position,holder.itemView.context) }
         }
 
         holder.itemView.setOnClickListener {
@@ -78,14 +87,37 @@ class CartAdapter(private var productList: List<Product>,val userId: Int) : Recy
         this.onClickListener = onClickListener
     }
 
-    private fun updateCart(itemId: Int,quantity: Int){
+    private fun removeItem(position: Int) {
+        productList = productList.toMutableList().apply { removeAt(position) }
+        notifyItemRemoved(position)
+        if(productList.isEmpty())
+            listener.restoreCart()
+    }
+
+    private fun updateCart(itemId: Int,quantity: Int,context: Context){
         var query = "UPDATE cart_items set quantity=$quantity where id=$itemId;"
 
-        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
-            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
+        ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                Toast.makeText(context, "Quantità aggiornata", Toast.LENGTH_LONG).show()
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+            }
+        })
+    }
 
+    private fun removeFromCart(itemId: Int,position: Int,context: Context){
+        var query = "DELETE FROM cart_items WHERE id=$itemId;"
 
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {}
+        ClientNetwork.retrofit.remove(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                Toast.makeText(context, "Prodotto " + productList.get(position).name + " rimosso", Toast.LENGTH_LONG).show()
+                removeItem(position)
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+            }
         })
     }
 

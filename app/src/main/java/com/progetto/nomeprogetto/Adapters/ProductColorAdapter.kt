@@ -47,7 +47,7 @@ class ProductColorAdapter(private var colorList: ArrayList<ProductColor>) : Recy
         holder.colorView.backgroundTintList = ColorStateList.valueOf(Color.parseColor(color.hex))
         if(color.color_id == colorSelected) {
             positionSelected = position
-            holder.colorView.strokeColor = Color.CYAN
+            holder.colorView.strokeColor = Color.parseColor("#FF3C00")
         }else
             holder.colorView.strokeColor = Color.TRANSPARENT
 

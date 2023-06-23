@@ -15,6 +15,7 @@
         android:textSize="16dp" />
 
     <com.google.android.material.card.MaterialCardView
+        android:layout_marginBottom="2dp"
         android:id="@+id/color_view"
         android:layout_width="35dp"
         android:layout_height="35dp"

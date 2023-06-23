@@ -93,8 +93,11 @@ class HomeFragment : Fragment() {
                                             val picture = BitmapFactory.decodeStream(response.body()?.byteStream())
                                             categoriesList.put(name,picture)
                                             loadedCategories++
-                                            if (loadedCategories == categoriesArray.size())
+                                            if (loadedCategories == categoriesArray.size()) {
+                                                binding.emptyCategories.visibility = View.GONE
+                                                binding.recyclerViewCategory.visibility = View.VISIBLE
                                                 binding.recyclerViewCategory.adapter?.notifyDataSetChanged()
+                                            }
                                         }
                                     }
                                 }
@@ -148,8 +151,11 @@ class HomeFragment : Fragment() {
                                             val product = Product(id, name, description, price,width,height,length,main_picture,avgRating,reviewsNumber,uploadDate)
                                             productList.add(product)
                                             loadedProducts++
-                                            if(loadedProducts==productsArray.size())
+                                            if(loadedProducts==productsArray.size()) {
+                                                binding.emptyNews.visibility = View.GONE
+                                                binding.recyclerViewNews.visibility = View.VISIBLE
                                                 binding.recyclerViewNews.adapter?.notifyDataSetChanged()
+                                            }
                                         }
                                     }
                                 }//
