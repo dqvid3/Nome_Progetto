@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <Button
         android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout" />
+        android:layout_width="174dp"
+        android:layout_height="73dp"
+        android:text="Logout"
+        tools:layout_editor_absoluteX="118dp"
+        tools:layout_editor_absoluteY="620dp" />
 
     <Button
         android:id="@+id/uploadPicture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Carica foto"/>
+        android:layout_width="162dp"
+        android:layout_height="43dp"
+        android:text="Carica foto"
+        tools:layout_editor_absoluteX="119dp"
+        tools:layout_editor_absoluteY="16dp" />
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher_background" />
+        android:layout_width="162dp"
+        android:layout_height="155dp"
+        android:src="@drawable/ic_launcher_background"
+        tools:layout_editor_absoluteX="119dp"
+        tools:layout_editor_absoluteY="59dp" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
