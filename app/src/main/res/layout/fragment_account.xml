@@ -10,7 +10,7 @@
         android:layout_width="401dp"
         android:layout_height="352dp"
         android:outlineAmbientShadowColor="@color/black"
-        app:cardBackgroundColor="@android:color/darker_gray"
+        app:cardBackgroundColor="@color/blackPart"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toBottomOf="@+id/logoutButton"
         app:layout_constraintEnd_toEndOf="parent"
