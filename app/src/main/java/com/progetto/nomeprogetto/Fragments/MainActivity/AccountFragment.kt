@@ -25,20 +25,6 @@ class AccountFragment : Fragment() {
     ): View? {
         binding = FragmentAccountBinding.inflate(inflater)
 
-        binding.logoutButton.setOnClickListener{
-            val sharedPref = requireContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            editor.putBoolean("IS_LOGGED_IN", false).putInt("ID",-1)
-            editor.apply()
-            val i = Intent(requireContext(), LoginRegisterActivity::class.java)
-            startActivity(i)
-
-            parentFragmentManager.beginTransaction()
-                .remove(this)
-                .commit()
-
-            requireActivity().finish()
-        }
 
         return binding.root
     }
