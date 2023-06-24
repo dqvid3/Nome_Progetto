@@ -19,7 +19,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CartAdapter(private var productList: List<Product>,private val listener: CartAdapterListener) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+class CartAdapter(private var productList: List<Product>,private val listener: CartAdapterListener,private val userId: Int?) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 
@@ -31,6 +31,7 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
         val colorName = binding.colorName
         val colorView = binding.colorView
         val removeProduct = binding.removeProduct
+        val addToWish = binding.addToWish
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -47,7 +48,7 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val product = productList[position]
 
-        holder.imageView.setImageBitmap(product.main_picture)
+        holder.imageView.setImageBitmap(product.picture)
         holder.productName.text = product.name
         holder.price.text = product.price.toString() + " €"
         holder.colorName.text = product.colorName
@@ -74,6 +75,10 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
             product.itemId?.let { removeFromCart(it,position,holder.itemView.context) }
         }
 
+        holder.addToWish.setOnClickListener{
+            product.colorId?.let { addToWish(it,holder.itemView.context) }
+        }
+
         holder.itemView.setOnClickListener {
             onClickListener?.onClick(product)
         }
@@ -98,12 +103,10 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
         var query = "UPDATE cart_items set quantity=$quantity where id=$itemId;"
 
         ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
-            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) =
                 Toast.makeText(context, "Quantità aggiornata", Toast.LENGTH_LONG).show()
-            }
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-            }
         })
     }
 
@@ -111,14 +114,40 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
         var query = "DELETE FROM cart_items WHERE id=$itemId;"
 
         ClientNetwork.retrofit.remove(query).enqueue(object : Callback<JsonObject> {
-            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                Toast.makeText(context, "Prodotto " + productList.get(position).name + " rimosso", Toast.LENGTH_LONG).show()
-                removeItem(position)
-            }
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) = removeItem(position)
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-            }
         })
     }
 
+    fun addToWish(colorId: Int,context: Context){
+        var query = "SELECT id from wishlist_items where user_id=$userId and color_id=$colorId;"
+
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val itemsArray = response.body()?.getAsJsonArray("queryset")
+                    if (itemsArray != null && itemsArray.size() > 0) {
+                        Toast.makeText(context, "Articolo già presente nella wishlist", Toast.LENGTH_LONG).show()
+                    }else{
+                        query = "INSERT INTO wishlist_items (user_id,color_id) VALUES ($userId,$colorId);"
+
+                        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
+                            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                                if (response.isSuccessful)
+                                    Toast.makeText(context, "Articolo aggiunto alla wishlist", Toast.LENGTH_SHORT).show()
+                                else
+                                    Toast.makeText(context, "Errore nell'inserimento dell'articolo, riprova", Toast.LENGTH_SHORT).show()
+                            }
+
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                        })
+                    }
+                }
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
 }

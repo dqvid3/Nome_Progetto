@@ -1,6 +1,7 @@
 package com.progetto.nomeprogetto.Fragments.MainActivity
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -15,6 +16,7 @@ import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.CartAdapter
 import com.progetto.nomeprogetto.Adapters.CartAdapterListener
 import com.progetto.nomeprogetto.Adapters.ProductAdapter
+import com.progetto.nomeprogetto.Adapters.WishlistAdapter
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.ProductDetailFragment
 import com.progetto.nomeprogetto.Objects.Product
@@ -41,14 +43,21 @@ class CartFragment : Fragment(), CartAdapterListener {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCartBinding.inflate(inflater)
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val itemDecoration = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
+        binding.recyclerView.addItemDecoration(itemDecoration)
         loadCart()
+
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val position = tab?.position
                 if(position==0){ // 0 -> Cart
+                    binding.emptyCart.text = "Non hai articoli nel carrello"
                     loadCart()
-                }else if(position==1){ // 1 -> Last orders
-                    loadLastOrders()
+                }else if(position==1){ // 1 -> WishList
+                    binding.emptyCart.text = "Non hai articoli nella wishlist"
+                    loadWishList()
                 }
             }
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -59,16 +68,14 @@ class CartFragment : Fragment(), CartAdapterListener {
     }
 
     private fun loadCart(){
+        binding.emptyCart.text = "Non hai articoli nel carrello"
         val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         val userId = sharedPref.getInt("ID", 0)
         val productList = ArrayList<Product>()
-        val adapter = CartAdapter(productList,this)
+        val adapter = CartAdapter(productList,this,userId)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val itemDecoration = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
-        binding.recyclerView.addItemDecoration(itemDecoration)
         binding.recyclerView.adapter = adapter
-        setCartProducts(userId,productList)
+        setProducts(userId,productList,0)
 
         adapter.setOnClickListener(object: CartAdapter.OnClickListener{
             override fun onClick(product: Product) {
@@ -83,12 +90,45 @@ class CartFragment : Fragment(), CartAdapterListener {
         })
     }
 
-    private fun setCartProducts(userId: Int, productList: ArrayList<Product>){
-        var query = "SELECT ci.id as itemId,ci.quantity,pc.stock,pc.color,pc.color_hex,p.id,name,description,price,width,height" +
-                ",length,main_picture_path,upload_date, " +
+    private fun loadWishList(){
+        binding.emptyCart.text = "Non hai articoli nella wishlist"
+        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("ID", 0)
+        val productList = ArrayList<Product>()
+        val adapter = WishlistAdapter(productList,this,userId)
+
+        binding.recyclerView.adapter = adapter
+        setProducts(userId,productList,1)
+
+        adapter.setOnClickListener(object: WishlistAdapter.OnClickListener{
+            override fun onClick(product: Product) {
+                val bundle = Bundle()
+                bundle.putParcelable("product", product)
+                val productDetailFragment = ProductDetailFragment()
+                productDetailFragment.arguments = bundle
+                parentFragmentManager.beginTransaction().hide(this@CartFragment)
+                    .add(R.id.home_fragment_container,productDetailFragment)
+                    .commit()
+            }
+        })
+    }
+
+    private fun setProducts(userId: Int, productList: ArrayList<Product>,type: Int){
+        productList.clear()
+        var query = ""
+        if(type==0) //cart
+            query = "SELECT ci.id as itemId,ci.quantity,pc.stock,pc.color,pc.color_hex,p.id,name,description,price," +
+                "width,height,length,main_picture_path,upload_date,pp.picture_path,ci.color_id," +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count, " +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
-                "FROM products p, cart_items ci,product_colors pc WHERE ci.user_id=$userId and pc.id = ci.color_id;"
+                "FROM products p, cart_items ci,product_colors pc,product_pictures pp WHERE ci.user_id=$userId and pc.id = ci.color_id " +
+                "and pp.picture_index=0 and pp.color_id=pc.id;"
+        else query = "SELECT wi.id as itemId,wi.user_id,pc.color,pc.color_hex,pp.picture_path,p.id,name,description,price,width,height," +
+                "length,main_picture_path,upload_date,wi.color_id, " +
+                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
+                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
+                "FROM products p, wishlist_items wi,product_colors pc,product_pictures pp WHERE wi.user_id=1 " +
+                "and pc.id = wi.color_id and pp.picture_index=0 and pp.color_id=pc.id"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -111,43 +151,51 @@ class CartFragment : Fragment(), CartAdapterListener {
                             val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
                             val uploadDate = LocalDateTime.parse(date, formatter)
                             val main_picture_path = productObject.get("main_picture_path").asString
-                            val stock = productObject.get("stock").asInt
-                            val quantity = productObject.get("quantity").asInt
                             val color = productObject.get("color").asString
                             val itemId = productObject.get("itemId").asInt
                             val color_hex = productObject.get("color_hex").asString
-                            ClientNetwork.retrofit.image(main_picture_path).enqueue(object : Callback<ResponseBody> {
-                                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                                    if(response.isSuccessful) {
-                                        if (response.body()!=null) {
-                                            val main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                            val product = Product(id, name, description, price,width,height,length,main_picture
-                                                ,avgRating,reviewsNumber,uploadDate,itemId,color,color_hex,quantity,stock)
-                                            productList.add(product)
-                                            loadedProducts++
-                                            if(loadedProducts==productsArray.size()) {
-                                                binding.emptyCart.visibility = View.GONE
-                                                binding.recyclerView.visibility = View.VISIBLE
-                                                binding.recyclerView.adapter?.notifyDataSetChanged()
+                            val picture_path = productObject.get("picture_path").asString
+                            val colorId = productObject.get("color_id").asInt
+                            var stock: Int? = null
+                            var quantity: Int? = null
+                            if(type == 0){
+                                stock = productObject.get("stock").asInt
+                                quantity = productObject.get("quantity").asInt
+                            }
+                            var main_picture : Bitmap? = null
+                            var picture : Bitmap? = null
+                            for(i in 0..1) {
+                                ClientNetwork.retrofit.image(if (i==0) main_picture_path else picture_path).enqueue(object : Callback<ResponseBody> {
+                                        override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                                            if (response.isSuccessful) {
+                                                if (response.body() != null) {
+                                                    if(i==0) main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                                    else picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                                    if(i==1) {
+                                                        val product = Product(id, name, description, price, width, height,
+                                                            length, main_picture, avgRating, reviewsNumber, uploadDate,
+                                                            itemId, color, color_hex, quantity, stock, picture,colorId)
+                                                        productList.add(product)
+                                                        loadedProducts++
+                                                        if (loadedProducts == productsArray.size()) {
+                                                            binding.emptyCart.visibility = View.GONE
+                                                            binding.recyclerView.visibility = View.VISIBLE
+                                                            binding.recyclerView.adapter?.notifyDataSetChanged()
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
-                                    }
-                                }
-                                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                                    Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                                }
-                            })
+                                        override fun onFailure(call: Call<ResponseBody>, t: Throwable) =
+                                            Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                    })
+                            }
                         }
-                    }
+                    }else restoreCart()
                 }
             }
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-            }
         })
-    }
-
-    private fun loadLastOrders(){
-
     }
 }

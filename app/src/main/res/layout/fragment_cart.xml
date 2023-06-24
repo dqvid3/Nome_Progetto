@@ -26,8 +26,8 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/ic_bag"
-            android:text="Acquista di nuovo"/>
+            android:icon="@drawable/ic_heart"
+            android:text="Lista dei desideri"/>
 
     </com.google.android.material.tabs.TabLayout>
 
@@ -39,7 +39,8 @@
         android:layout_height="wrap_content"
         android:text="Non hai articoli nel carrello"
         android:textSize="20dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

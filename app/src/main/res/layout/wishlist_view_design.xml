@@ -13,7 +13,7 @@
         <ImageView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:id="@+id/imageView"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
@@ -22,8 +22,10 @@
 
         <LinearLayout
             android:layout_margin="8dp"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="vertical">
 
             <TextView
@@ -64,26 +66,8 @@
                 android:textColor="@android:color/holo_blue_light"
                 android:text="Rimuovi" />
 
-            <TextView
-                android:id="@+id/add_to_wish"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/holo_blue_light"
-                android:text="Aggiungi alla lista dei desideri" />
 
         </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Quantità: "
-            android:layout_gravity="center"/>
-
-        <Spinner
-            android:id="@+id/spinner_qty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
 
     </LinearLayout>
 

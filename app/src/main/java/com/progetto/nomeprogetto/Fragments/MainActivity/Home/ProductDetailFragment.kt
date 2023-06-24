@@ -121,7 +121,7 @@ class ProductDetailFragment : Fragment() {
             val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             val userId = sharedPref.getInt("ID", 0)
             val qty = binding.spinnerQty.selectedItem.toString().toInt()
-            addToCart(userId,product?.id,qty,colorSelected)
+            addToCart(userId,qty,colorSelected)
         }
 
         binding.addToWish.setOnClickListener{
@@ -141,7 +141,7 @@ class ProductDetailFragment : Fragment() {
         return binding.root
     }
 
-    private fun addToCart(userId: Int?,productId: Int?,qty: Int,colorId: Int){
+    private fun addToCart(userId: Int?,qty: Int,colorId: Int){
         var query = "SELECT id,quantity from cart_items where user_id=$userId and color_id=$colorId;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
