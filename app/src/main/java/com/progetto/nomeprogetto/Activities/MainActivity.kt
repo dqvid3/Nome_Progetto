@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.widget.EditText
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView.SearchAutoComplete
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.MainActivity.*
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.HomeFragment
@@ -21,6 +24,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val searchEditText = binding.searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        searchEditText.setTextColor(ContextCompat.getColor(this, R.color.white))
+
 
         supportFragmentManager.beginTransaction()
             .add(binding.homeFragmentHomeContainer.id, HomeFragment())

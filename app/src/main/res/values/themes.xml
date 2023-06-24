@@ -16,4 +16,9 @@
         <item name="android:fontFamily">@font/led_font</item>
         <item name="android:textSize">13dp</item>
     </style>
+
+    <style name="CustomSearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:editTextColor">@color/white</item>
+    </style>
 </resources>

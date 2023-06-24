@@ -19,17 +19,6 @@ class AccountFragment : Fragment() {
 
     private lateinit var binding: FragmentAccountBinding
 
-    private val someActivityResultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data: Intent? = result.data
-            val imageUri = data?.data
-            imageUri?.let {
-                val inputStream = requireContext().contentResolver.openInputStream(it)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                binding.imageView.setImageBitmap(bitmap)
-            }
-        }
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,11 +38,6 @@ class AccountFragment : Fragment() {
                 .commit()
 
             requireActivity().finish()
-        }
-
-        binding.uploadPicture.setOnClickListener{
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            someActivityResultContract.launch(intent)
         }
 
         return binding.root
