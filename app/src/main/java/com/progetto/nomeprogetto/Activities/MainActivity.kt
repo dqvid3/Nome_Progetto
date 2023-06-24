@@ -79,22 +79,22 @@ class MainActivity : AppCompatActivity() {
                             }
                         binding.homeFragmentHomeContainer.visibility = View.VISIBLE
                     }
-                    binding.searchView.visibility = View.VISIBLE
+                    //binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 R.id.navigation_cart -> {
                     openFragment(CartFragment())
-                    binding.searchView.visibility = View.GONE
+                    //binding.searchView.visibility = View.GONE
                     true
                 }
                 R.id.navigation_account -> {
                     openFragment(AccountFragment())
-                    binding.searchView.visibility = View.VISIBLE
+                    //binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 R.id.navigation_settings -> {
                     openFragment(SettingsFragment())
-                    binding.searchView.visibility = View.VISIBLE
+                    //binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 else -> false

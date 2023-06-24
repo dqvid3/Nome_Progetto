@@ -120,7 +120,7 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
         })
     }
 
-    fun addToWish(colorId: Int,context: Context){
+    private fun addToWish(colorId: Int,context: Context){
         var query = "SELECT id from wishlist_items where user_id=$userId and color_id=$colorId;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {

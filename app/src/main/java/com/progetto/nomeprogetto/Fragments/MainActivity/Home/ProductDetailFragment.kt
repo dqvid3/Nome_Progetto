@@ -81,16 +81,11 @@ class ProductDetailFragment : Fragment() {
         binding.recyclerReviewsView.addItemDecoration(itemDecoration)
         setReviews(product?.id, reviewList)
 
-        imageAdapter.setOnClickListener(object : ProductImageAdapter.OnClickListener {
-            override fun onClick() {
-
-            }
-        })
-
         colorAdapter.setOnClickListener(object : ProductColorAdapter.OnClickListener {
             override fun onClick(position: Int) {
                 val prevPos = colorAdapter.getPosition()
                 colorSelected = colorList.get(position).color_id
+                setWishButton(colorSelected)
                 currentStock = colorList.get(position).stock
                 colorAdapter.setColor(colorSelected)
                 colorAdapter.notifyItemChanged(position)
@@ -128,9 +123,11 @@ class ProductDetailFragment : Fragment() {
             if(!addToWish) {
                 binding.addToWish.imageTintList = ColorStateList.valueOf(Color.RED)
                 addToWish = true
+                addToWish(colorSelected)
             }else{
                 binding.addToWish.imageTintList = ColorStateList.valueOf(Color.GRAY)
                 addToWish = false
+                removeFromWish(colorSelected)
             }
         }
 
@@ -165,14 +162,12 @@ class ProductDetailFragment : Fragment() {
                                     else
                                         Toast.makeText(requireContext(), "Errore nell'inserimento dell'articolo, riprova",Toast.LENGTH_SHORT).show()
                                 }
-                                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                                override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                                     Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                                }
                             })
                         }
                     }else{ //se non esiste nel carrello lo aggiungo
-                        query = "INSERT INTO cart_items (user_id,quantity,color_id)" +
-                                    " VALUES ($userId,$qty,$colorId);"
+                        query = "INSERT INTO cart_items (user_id,quantity,color_id) VALUES ($userId,$qty,$colorId);"
 
                         ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
                             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -181,18 +176,59 @@ class ProductDetailFragment : Fragment() {
                                 else
                                     Toast.makeText(requireContext(), "Errore nell'inserimento dell'articolo, riprova", Toast.LENGTH_SHORT).show()
                             }
-
-                            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                            }
                         })
                     }
                 }
             }
-
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
+
+    private fun addToWish(colorId: Int){
+        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("ID", 0)
+        var query = "SELECT id from wishlist_items where user_id=$userId and color_id=$colorId;"
+
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val itemsArray = response.body()?.getAsJsonArray("queryset")
+                    if (itemsArray != null && itemsArray.size() > 0) {
+                        Toast.makeText(requireContext(), "Articolo già presente nella wishlist", Toast.LENGTH_LONG).show()
+                    }else{
+                        query = "INSERT INTO wishlist_items (user_id,color_id) VALUES ($userId,$colorId);"
+
+                        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
+                            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                                if (response.isSuccessful)
+                                    Toast.makeText(requireContext(), "Articolo aggiunto alla wishlist", Toast.LENGTH_SHORT).show()
+                                else
+                                    Toast.makeText(requireContext(), "Errore nell'inserimento dell'articolo, riprova", Toast.LENGTH_SHORT).show()
+                            }
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                        })
+                    }
+                }
             }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
+
+    private fun removeFromWish(colorId: Int){
+        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("ID", 0)
+        var query = "DELETE FROM wishlist_items where user_id=$userId and color_id=$colorId;"
+
+        ClientNetwork.retrofit.remove(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) =
+                Toast.makeText(context, "Articolo rimosso dalla wishlist", Toast.LENGTH_LONG).show()
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
         })
     }
 
@@ -216,6 +252,7 @@ class ProductDetailFragment : Fragment() {
                             if(i==0){
                                 currentStock = stock
                                 colorSelected = color_id
+                                setWishButton(colorSelected)
                                 setImages(productId, imageList,colorSelected)
                                 val quantityOptions = (1..stock).toList()
                                 val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, quantityOptions)
@@ -229,9 +266,31 @@ class ProductDetailFragment : Fragment() {
                     }
                 }
             }
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
+
+    private fun setWishButton(colorId: Int){
+        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("ID", 0)
+        var query = "SELECT id from wishlist_items where user_id=$userId and color_id=$colorId;"
+
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val itemsArray = response.body()?.getAsJsonArray("queryset")
+                    if (itemsArray != null && itemsArray.size() > 0) {
+                        binding.addToWish.imageTintList = ColorStateList.valueOf(Color.RED)
+                        addToWish = true
+                    }else{
+                        binding.addToWish.imageTintList = ColorStateList.valueOf(Color.GRAY)
+                        addToWish = false
+                    }
+                }
             }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
         })
     }
 
@@ -250,44 +309,31 @@ class ProductDetailFragment : Fragment() {
                             val picture_path = pictureObject.get("picture_path").asString
                             val pictureIndex = pictureObject.get("picture_index").asInt
                             ClientNetwork.retrofit.image(picture_path).enqueue(object : Callback<ResponseBody> {
-                                    override fun onResponse(
-                                        call: Call<ResponseBody>,
-                                        response: Response<ResponseBody>
-                                    ) {
-                                        if (response.isSuccessful) {
-                                            if (response.body() != null) {
-                                                val picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                                imageList[pictureIndex] = picture
-                                                loadedImages++
-                                                if (loadedImages == picturesArray.size())
-                                                    binding.recyclerImageView.adapter?.notifyDataSetChanged()
-                                            }
+                                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                                    if (response.isSuccessful) {
+                                        if (response.body() != null) {
+                                            val picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                            imageList[pictureIndex] = picture
+                                            loadedImages++
+                                            if (loadedImages == picturesArray.size())
+                                                binding.recyclerImageView.adapter?.notifyDataSetChanged()
                                         }
                                     }
-
-                                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "Failed request: " + t.message,
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                    }
-                                })
+                                }
+                                override fun onFailure(call: Call<ResponseBody>, t: Throwable) =
+                                    Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                            })
                         }
                     }
                 }
             }
-
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG)
-                    .show()
-            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
         })
     }
 
     private fun setReviews(productId: Int?, reviewList: ArrayList<ProductReview>) {
-        val query = "SELECT pr.rating, pr.comment, pr.review_date, u.username\n" +
-                "FROM product_reviews pr, users u\n" +
+        val query = "SELECT pr.rating, pr.comment, pr.review_date, u.username FROM product_reviews pr, users u " +
                 "WHERE pr.user_id = u.id and pr.product_id = $productId;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
@@ -313,11 +359,8 @@ class ProductDetailFragment : Fragment() {
                     }
                 }
             }
-
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG)
-                    .show()
-            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
         })
     }
 }

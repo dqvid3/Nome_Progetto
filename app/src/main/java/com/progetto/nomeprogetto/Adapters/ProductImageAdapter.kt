@@ -9,8 +9,6 @@ import com.progetto.nomeprogetto.databinding.ProductImageViewDesignBinding
 
 class ProductImageAdapter(private var imageList: HashMap<Int,Bitmap>) : RecyclerView.Adapter<ProductImageAdapter.ViewHolder>() {
 
-    private var onClickListener: OnClickListener? = null
-
     class ViewHolder(binding: ProductImageViewDesignBinding) : RecyclerView.ViewHolder(binding.root) {
         val imageView = binding.imageView
     }
@@ -30,16 +28,5 @@ class ProductImageAdapter(private var imageList: HashMap<Int,Bitmap>) : Recycler
         val image = imageList[position]
 
         holder.imageView.setImageBitmap(image)
-        holder.itemView.setOnClickListener {
-            onClickListener?.onClick()
-        }
-    }
-
-    interface OnClickListener {
-        fun onClick()
-    }
-
-    fun setOnClickListener(onClickListener: OnClickListener) {
-        this.onClickListener = onClickListener
     }
 }
