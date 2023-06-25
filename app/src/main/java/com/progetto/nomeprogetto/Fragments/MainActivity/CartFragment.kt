@@ -51,6 +51,7 @@ class CartFragment : Fragment(), CartAdapterListener {
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val position = tab?.position
+                binding.emptyCart.visibility = View.GONE
                 if(position==0){ // 0 -> Cart
                     binding.emptyCart.text = "Non hai articoli nel carrello"
                     loadCart()

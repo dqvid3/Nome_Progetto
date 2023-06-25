@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.CategoryImageAdapter
@@ -111,6 +112,7 @@ class HomeFragment : Fragment() {
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)?.selectedItemId = R.id.navigation_home
             }
         })
     }
@@ -158,7 +160,7 @@ class HomeFragment : Fragment() {
                                             }
                                         }
                                     }
-                                }//
+                                }
                                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                                     Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
                                 }
@@ -169,6 +171,7 @@ class HomeFragment : Fragment() {
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)?.selectedItemId = R.id.navigation_home
             }
         })
     }
