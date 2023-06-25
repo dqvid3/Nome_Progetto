@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.ProductAdapter
@@ -42,6 +43,35 @@ class ProductFragment : Fragment() {
         arguments?.getString("searchQuery")?.let { setProducts(it,productList,0) } // 0 query normale
         arguments?.getString("category_name")?.let { setProducts(it,productList,1) } // 1 query per categoria
 
+        setProductAdapter(productList)
+
+        binding.sortButton.setOnClickListener{
+            showSortOptions(binding.sortButton,productList)
+        }
+
+        binding.backButton.setOnClickListener{
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.home_fragment_home_container,HomeFragment())
+                .commit()
+        }
+
+        binding.chipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
+            val selectedCategories = mutableListOf<String>()
+            for (i in 0 until chipGroup.childCount) {
+                val chip = chipGroup.getChildAt(i) as Chip
+                if (chip.isChecked) {
+                    selectedCategories.add(chip.text.toString())
+                }
+            }
+            filterProductsByCategory(selectedCategories,productList)
+        }
+
+        return binding.root
+    }
+
+    private fun setProductAdapter(productList: ArrayList<Product>){
+        val adapter = ProductAdapter(productList)
+        binding.recyclerView.adapter = adapter
         adapter.setOnClickListener(object: ProductAdapter.OnClickListener{
             override fun onClick(product: Product) {
                 val bundle = Bundle()
@@ -54,29 +84,25 @@ class ProductFragment : Fragment() {
             }
         })
 
-        binding.sortButton.setOnClickListener{
-            showSortOptions(binding.sortButton,productList)
-        }
-
-        binding.backButton.setOnClickListener{
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.home_fragment_home_container,HomeFragment())
-                .commit()
-        }
-
-        return binding.root
+    }
+    private fun filterProductsByCategory(selectedCategories: List<String>,productList: ArrayList<Product>) {
+        val filteredList = if (selectedCategories.isEmpty())
+            productList
+        else
+            productList.filter { selectedCategories.contains(it.category) }
+        setProductAdapter(filteredList as ArrayList<Product>)
     }
 
     private fun setProducts(productSearched: String, productList: ArrayList<Product>,searchType: Int){
         var query = ""
         if(searchType==0)
-            query = "SELECT id,name,description,price,width,height,length,main_picture_path,upload_date,\n" +
-                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
-                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
-                "FROM products p WHERE LOWER(p.name) LIKE LOWER('%$productSearched%');"
-        else query = "SELECT p.id,p.name,p.description,price,width,height,length,main_picture_path,upload_date,\n" +
-                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count,\n" +
-                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating\n" +
+            query = "SELECT c.name as category,p.id,p.name,description,price,width,height,length,main_picture_path,upload_date," +
+                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
+                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
+                "FROM products p,categories c WHERE c.id=p.category_id and LOWER(p.name) LIKE LOWER('%$productSearched%');"
+        else query = "SELECT p.id,p.name,p.description,price,width,height,length,main_picture_path,upload_date," +
+                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
+                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
                 "FROM products p,categories c WHERE p.category_id = c.id and c.name='$productSearched';"
         val context = requireContext()
 
@@ -101,17 +127,31 @@ class ProductFragment : Fragment() {
                             val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
                             val uploadDate = LocalDateTime.parse(date, formatter)
                             val main_picture_path = productObject.get("main_picture_path").asString
+                            var category: String? =
+                                if(searchType==0)
+                                    productObject.get("category").asString
+                                else
+                                    null
                             ClientNetwork.retrofit.image(main_picture_path).enqueue(object : Callback<ResponseBody> {
                                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                                     if(response.isSuccessful) {
                                         if (response.body()!=null) {
                                             val main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
                                             val product = Product(id, name, description, price,width,height,length,main_picture
-                                                ,avgRating,reviewsNumber,uploadDate)
+                                                ,avgRating,reviewsNumber,uploadDate, category = category)
                                             productList.add(product)
                                             loadedProducts++
-                                            if(loadedProducts==productsArray.size())
+                                            if(loadedProducts==productsArray.size()) {
                                                 binding.recyclerView.adapter?.notifyDataSetChanged()
+                                                for(product in productList) {
+                                                    if (product.category != null) {
+                                                        val chip = Chip(context)
+                                                        chip.text = product.category
+                                                        chip.isCheckable = true
+                                                        binding.chipGroup.addView(chip)
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }

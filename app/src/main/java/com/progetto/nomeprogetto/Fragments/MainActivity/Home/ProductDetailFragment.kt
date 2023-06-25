@@ -87,6 +87,10 @@ class ProductDetailFragment : Fragment() {
                 colorSelected = colorList.get(position).color_id
                 setWishButton(colorSelected)
                 currentStock = colorList.get(position).stock
+                if (currentStock==0)
+                    outOfStock()
+                else
+                    productAvailable()
                 colorAdapter.setColor(colorSelected)
                 colorAdapter.notifyItemChanged(position)
                 colorAdapter.notifyItemChanged(prevPos)
@@ -136,6 +140,20 @@ class ProductDetailFragment : Fragment() {
         binding.productPrice.text = product?.price.toString() + " €"
 
         return binding.root
+    }
+
+    private fun outOfStock(){
+        binding.qtyText.visibility = View.GONE
+        binding.spinnerQty.visibility = View.GONE
+        binding.noStock.visibility = View.VISIBLE
+        binding.addToCart.visibility = View.GONE
+    }
+
+    private fun productAvailable(){
+        binding.qtyText.visibility = View.VISIBLE
+        binding.spinnerQty.visibility = View.VISIBLE
+        binding.noStock.visibility = View.GONE
+        binding.addToCart.visibility = View.VISIBLE
     }
 
     private fun addToCart(userId: Int?,qty: Int,colorId: Int){
@@ -250,6 +268,8 @@ class ProductDetailFragment : Fragment() {
                             val stock = colorObject.get("stock").asInt
                             colorList.add(ProductColor(colorName,color_id,colorHex,stock))
                             if(i==0){
+                                if (stock==0)
+                                    outOfStock()
                                 currentStock = stock
                                 colorSelected = color_id
                                 setWishButton(colorSelected)
