@@ -73,9 +73,21 @@
                 android:textColor="@android:color/holo_blue_light"
                 android:text="Aggiungi alla lista dei desideri" />
 
+            <TextView
+                android:id="@+id/no_stock"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Articolo al momento non disponibile"
+                android:textStyle="italic"
+                android:textColor="@color/redPart"
+                android:layout_gravity="center"/>
         </LinearLayout>
 
+
+
         <LinearLayout
+            android:id="@+id/qty_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"

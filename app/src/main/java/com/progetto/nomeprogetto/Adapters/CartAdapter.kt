@@ -32,6 +32,8 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
         val colorView = binding.colorView
         val removeProduct = binding.removeProduct
         val addToWish = binding.addToWish
+        val qtyLayout = binding.qtyLayout
+        val noStock = binding.noStock
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,6 +55,11 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
         holder.price.text = product.price.toString() + " €"
         holder.colorName.text = product.colorName
         holder.colorView.backgroundTintList = ColorStateList.valueOf(Color.parseColor(product.color_hex))
+
+        if (product.stock==0){
+            holder.qtyLayout.visibility = View.GONE
+            holder.noStock.visibility = View.VISIBLE
+        }
 
         val quantityOptions = (1..product.stock!!).toList()
         val adapter = ArrayAdapter(holder.itemView.context, R.layout.simple_spinner_item, quantityOptions)
