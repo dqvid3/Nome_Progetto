@@ -198,4 +198,16 @@ class CartFragment : Fragment(), CartAdapterListener {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
         })
     }
+
+    override fun onResume() {
+        super.onResume()
+        when(binding.tabLayout.selectedTabPosition){
+            0 -> {
+                loadCart()
+            }
+            1 -> {
+                loadWishList()
+            }
+        }
+    }
 }
