@@ -102,15 +102,11 @@ class ProductDetailFragment : Fragment() {
             val productFragment = parentFragmentManager.findFragmentByTag("ProductFragment")
             val cartFragment = parentFragmentManager.findFragmentByTag("CartFragment")
             if (productFragment != null)
-                parentFragmentManager.beginTransaction()
-                    .remove(this).show(productFragment)
+                parentFragmentManager.beginTransaction().remove(this).show(productFragment)
                     .commit()
-            else if (cartFragment != null) {
-                parentFragmentManager.beginTransaction()
-                    .remove(this).show(cartFragment)
+            else if (cartFragment != null)
+                parentFragmentManager.beginTransaction().remove(this).show(cartFragment)
                     .commit()
-                cartFragment.onResume()
-            }
             else // sto aprendo il prodotto dalle novità
                 parentFragmentManager.beginTransaction().replace(R.id.home_fragment_home_container, HomeFragment())
                     .commit()
