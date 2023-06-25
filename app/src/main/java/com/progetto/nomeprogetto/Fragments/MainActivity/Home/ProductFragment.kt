@@ -43,17 +43,7 @@ class ProductFragment : Fragment() {
         arguments?.getString("searchQuery")?.let { setProducts(it,productList,0) } // 0 query normale
         arguments?.getString("category_name")?.let { setProducts(it,productList,1) } // 1 query per categoria
 
-        adapter.setOnClickListener(object: ProductAdapter.OnClickListener{
-            override fun onClick(product: Product) {
-                val bundle = Bundle()
-                bundle.putParcelable("product", product)
-                val productDetailFragment = ProductDetailFragment()
-                productDetailFragment.arguments = bundle
-                parentFragmentManager.beginTransaction().hide(this@ProductFragment)
-                    .add(R.id.home_fragment_home_container,productDetailFragment)
-                    .commit()
-            }
-        })
+        setProductAdapter(productList)
 
         binding.sortButton.setOnClickListener{
             showSortOptions(binding.sortButton,productList)
@@ -79,12 +69,28 @@ class ProductFragment : Fragment() {
         return binding.root
     }
 
+    private fun setProductAdapter(productList: ArrayList<Product>){
+        val adapter = ProductAdapter(productList)
+        binding.recyclerView.adapter = adapter
+        adapter.setOnClickListener(object: ProductAdapter.OnClickListener{
+            override fun onClick(product: Product) {
+                val bundle = Bundle()
+                bundle.putParcelable("product", product)
+                val productDetailFragment = ProductDetailFragment()
+                productDetailFragment.arguments = bundle
+                parentFragmentManager.beginTransaction().hide(this@ProductFragment)
+                    .add(R.id.home_fragment_home_container,productDetailFragment)
+                    .commit()
+            }
+        })
+
+    }
     private fun filterProductsByCategory(selectedCategories: List<String>,productList: ArrayList<Product>) {
         val filteredList = if (selectedCategories.isEmpty())
             productList
         else
             productList.filter { selectedCategories.contains(it.category) }
-        binding.recyclerView.adapter = ProductAdapter(filteredList)
+        setProductAdapter(filteredList as ArrayList<Product>)
     }
 
     private fun setProducts(productSearched: String, productList: ArrayList<Product>,searchType: Int){
