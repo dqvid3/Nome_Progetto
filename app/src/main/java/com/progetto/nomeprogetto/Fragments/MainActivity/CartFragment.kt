@@ -33,6 +33,7 @@ class CartFragment : Fragment(), CartAdapterListener {
     override fun restoreCart() {
         binding.emptyCart.visibility = View.VISIBLE
         binding.recyclerView.visibility = View.GONE
+        binding.buyButton.visibility = View.GONE
     }
 
     private lateinit var binding: FragmentCartBinding
@@ -52,6 +53,7 @@ class CartFragment : Fragment(), CartAdapterListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val position = tab?.position
                 binding.emptyCart.visibility = View.GONE
+                binding.buyButton.visibility = View.GONE
                 if(position==0){ // 0 -> Cart
                     binding.emptyCart.text = "Non hai articoli nel carrello"
                     loadCart()
@@ -63,6 +65,10 @@ class CartFragment : Fragment(), CartAdapterListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
         })
+
+        binding.buyButton.setOnClickListener{
+
+        }
 
         return binding.root
     }
@@ -118,11 +124,11 @@ class CartFragment : Fragment(), CartAdapterListener {
         val query: String
         if(type==0) //cart
             query = "SELECT ci.id as itemId,ci.quantity,pc.stock,pc.color,pc.color_hex,p.id,name,description,price," +
-                "width,height,length,main_picture_path,upload_date,pp.picture_path,ci.color_id," +
-                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count, " +
-                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
-                "FROM products p, cart_items ci,product_colors pc,product_pictures pp WHERE ci.user_id=$userId " +
-                "and pc.id = ci.color_id and pp.picture_index=0 and pp.color_id=pc.id and p.id = pp.product_id;"
+                    "width,height,length,main_picture_path,upload_date,pp.picture_path,ci.color_id," +
+                    "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count, " +
+                    "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
+                    "FROM products p, cart_items ci,product_colors pc,product_pictures pp WHERE ci.user_id=$userId " +
+                    "and pc.id = ci.color_id and pp.picture_index=0 and pp.color_id=pc.id and p.id = pp.product_id;"
         else query = "SELECT wi.id as itemId,wi.user_id,pc.color,pc.color_hex,pp.picture_path,p.id,name,description,price,width,height," +
                 "length,main_picture_path,upload_date,wi.color_id, " +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
@@ -166,29 +172,30 @@ class CartFragment : Fragment(), CartAdapterListener {
                             var picture : Bitmap? = null
                             for(j in 0..1) {
                                 ClientNetwork.retrofit.image(if (j==0) main_picture_path else picture_path).enqueue(object : Callback<ResponseBody> {
-                                        override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                                            if (response.isSuccessful) {
-                                                if (response.body() != null) {
-                                                    if(j==0) main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                                    else picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                                    if(j==1) {
-                                                        val product = Product(id, name, description, price, width, height,
-                                                            length, main_picture, avgRating, reviewsNumber, uploadDate,
-                                                            itemId, color, color_hex, quantity, stock, picture,colorId)
-                                                        productList.add(product)
-                                                        loadedProducts++
-                                                        if (loadedProducts == productsArray.size()) {
-                                                            binding.emptyCart.visibility = View.GONE
-                                                            binding.recyclerView.visibility = View.VISIBLE
-                                                            binding.recyclerView.adapter?.notifyDataSetChanged()
-                                                        }
+                                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                                        if (response.isSuccessful) {
+                                            if (response.body() != null) {
+                                                if(j==0) main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                                else picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                                if(j==1) {
+                                                    val product = Product(id, name, description, price, width, height,
+                                                        length, main_picture, avgRating, reviewsNumber, uploadDate,
+                                                        itemId, color, color_hex, quantity, stock, picture,colorId)
+                                                    productList.add(product)
+                                                    loadedProducts++
+                                                    if (loadedProducts == productsArray.size()) {
+                                                        if(type==0) binding.buyButton.visibility = View.VISIBLE
+                                                        binding.emptyCart.visibility = View.GONE
+                                                        binding.recyclerView.visibility = View.VISIBLE
+                                                        binding.recyclerView.adapter?.notifyDataSetChanged()
                                                     }
                                                 }
                                             }
                                         }
-                                        override fun onFailure(call: Call<ResponseBody>, t: Throwable) =
-                                            Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                                    })
+                                    }
+                                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) =
+                                        Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                })
                             }
                         }
                     }else restoreCart()

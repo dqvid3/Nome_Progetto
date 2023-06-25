@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
         val searchEditText = binding.searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
         searchEditText.setTextColor(ContextCompat.getColor(this, R.color.white))
 
-
         supportFragmentManager.beginTransaction()
             .add(binding.homeFragmentHomeContainer.id, HomeFragment())
             .commit()
@@ -43,6 +42,8 @@ class MainActivity : AppCompatActivity() {
                     val bundle = Bundle()
                     bundle.putString("searchQuery",query)
                     productFragment.arguments = bundle
+
+                    binding.bottomNavigation.selectedItemId = R.id.navigation_home
                     supportFragmentManager.beginTransaction()
                         .replace(binding.homeFragmentHomeContainer.id, productFragment,"ProductFragment")
                         .commit()
@@ -56,15 +57,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFragment(fragment: Fragment){
-        if(fragment is CartFragment)
+        if (fragment is CartFragment)
             supportFragmentManager.beginTransaction()
-                .replace(binding.homeFragmentContainer.id, fragment, "CartFragment")
+                .replace(binding.homeFragmentContainer.id, fragment,"CartFragment")
                 .commit()
         else
             supportFragmentManager.beginTransaction()
-            .replace(binding.homeFragmentContainer.id, fragment)
-            .commit()
-        binding.homeFragmentHomeContainer.visibility = View.GONE
+                .replace(binding.homeFragmentContainer.id, fragment)
+                .commit()
+        supportFragmentManager.findFragmentById(binding.homeFragmentHomeContainer.id)?.let {
+            supportFragmentManager.beginTransaction()
+                .remove(it)
+                .commit()
+        }
     }
 
     private fun bottomNavigationSetUp(){
@@ -72,36 +77,26 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnItemSelectedListener{ item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
-                    if(binding.homeFragmentHomeContainer.visibility==View.VISIBLE){
+                    supportFragmentManager.beginTransaction()
+                        .replace(binding.homeFragmentHomeContainer.id,HomeFragment())
+                        .commit()
+                    supportFragmentManager.findFragmentById(binding.homeFragmentContainer.id)?.let {
                         supportFragmentManager.beginTransaction()
-                            .replace(binding.homeFragmentHomeContainer.id, HomeFragment())
+                            .remove(it)
                             .commit()
-                        binding.searchView.setQuery("",false)
-                    }else {
-                        supportFragmentManager.findFragmentById(binding.homeFragmentContainer.id)
-                            ?.let {
-                                supportFragmentManager.beginTransaction()
-                                    .remove(it)
-                                    .commit()
-                            }
-                        binding.homeFragmentHomeContainer.visibility = View.VISIBLE
                     }
-                    //binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 R.id.navigation_cart -> {
                     openFragment(CartFragment())
-                    //binding.searchView.visibility = View.GONE
                     true
                 }
                 R.id.navigation_account -> {
                     openFragment(AccountFragment())
-                    //binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 R.id.navigation_settings -> {
                     openFragment(SettingsFragment())
-                    //binding.searchView.visibility = View.VISIBLE
                     true
                 }
                 else -> false

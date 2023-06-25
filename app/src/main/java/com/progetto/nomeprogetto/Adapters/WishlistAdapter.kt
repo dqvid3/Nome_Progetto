@@ -68,8 +68,10 @@ class WishlistAdapter(private var productList: List<Product>,private val listene
     private fun removeItem(position: Int) {
         productList = productList.toMutableList().apply { removeAt(position) }
         notifyItemRemoved(position)
-        if(productList.isEmpty())
+        if (productList.isEmpty())
             listener.restoreCart()
+        else
+            notifyItemRangeChanged(position, productList.size)
     }
 
     private fun removeFromWishlist(itemId: Int,position: Int,context: Context){

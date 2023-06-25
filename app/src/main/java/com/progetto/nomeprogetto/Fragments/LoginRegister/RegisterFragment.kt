@@ -98,7 +98,7 @@ class RegisterFragment : Fragment() {
 
     private fun registerUser(user: User){
         val query = "INSERT INTO users (username, name, surname, email, password, salt, picture_path, address)\n" +
-        "VALUES ('${user.username}', '${user.name}', '${user.surname}'," +
+                "VALUES ('${user.username}', '${user.name}', '${user.surname}'," +
                 " '${user.email}', '${user.password}', '', '', '${user.address}');"
 
         ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
