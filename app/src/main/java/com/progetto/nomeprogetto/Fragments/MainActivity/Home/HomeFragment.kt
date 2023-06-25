@@ -112,7 +112,6 @@ class HomeFragment : Fragment() {
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)?.selectedItemId = R.id.navigation_home
             }
         })
     }
@@ -171,7 +170,6 @@ class HomeFragment : Fragment() {
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)?.selectedItemId = R.id.navigation_home
             }
         })
     }

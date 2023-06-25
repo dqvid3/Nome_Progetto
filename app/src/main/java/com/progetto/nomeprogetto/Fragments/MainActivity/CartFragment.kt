@@ -33,6 +33,7 @@ class CartFragment : Fragment(), CartAdapterListener {
     override fun restoreCart() {
         binding.emptyCart.visibility = View.VISIBLE
         binding.recyclerView.visibility = View.GONE
+        binding.buyButton.visibility = View.GONE
     }
 
     private lateinit var binding: FragmentCartBinding
@@ -52,6 +53,7 @@ class CartFragment : Fragment(), CartAdapterListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val position = tab?.position
                 binding.emptyCart.visibility = View.GONE
+                binding.buyButton.visibility = View.GONE
                 if(position==0){ // 0 -> Cart
                     binding.emptyCart.text = "Non hai articoli nel carrello"
                     loadCart()
@@ -63,6 +65,10 @@ class CartFragment : Fragment(), CartAdapterListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
         })
+
+        binding.buyButton.setOnClickListener{
+
+        }
 
         return binding.root
     }
@@ -178,6 +184,7 @@ class CartFragment : Fragment(), CartAdapterListener {
                                                         productList.add(product)
                                                         loadedProducts++
                                                         if (loadedProducts == productsArray.size()) {
+                                                            if(type==0) binding.buyButton.visibility = View.VISIBLE
                                                             binding.emptyCart.visibility = View.GONE
                                                             binding.recyclerView.visibility = View.VISIBLE
                                                             binding.recyclerView.adapter?.notifyDataSetChanged()

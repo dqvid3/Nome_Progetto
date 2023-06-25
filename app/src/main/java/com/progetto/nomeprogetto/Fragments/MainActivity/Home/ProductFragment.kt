@@ -94,7 +94,7 @@ class ProductFragment : Fragment() {
     }
 
     private fun setProducts(productSearched: String, productList: ArrayList<Product>,searchType: Int){
-        var query = ""
+        val query: String
         if(searchType==0)
             query = "SELECT c.name as category,p.id,p.name,description,price,width,height,length,main_picture_path,upload_date," +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
@@ -143,10 +143,10 @@ class ProductFragment : Fragment() {
                                             loadedProducts++
                                             if(loadedProducts==productsArray.size()) {
                                                 binding.recyclerView.adapter?.notifyDataSetChanged()
-                                                for(product in productList) {
-                                                    if (product.category != null) {
+                                                for(p in productList) {
+                                                    if (p.category != null) {
                                                         val chip = Chip(context)
-                                                        chip.text = product.category
+                                                        chip.text = p.category
                                                         chip.isCheckable = true
                                                         binding.chipGroup.addView(chip)
                                                     }
