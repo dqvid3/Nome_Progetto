@@ -15,7 +15,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.CartAdapter
 import com.progetto.nomeprogetto.Adapters.CartAdapterListener
-import com.progetto.nomeprogetto.Adapters.ProductAdapter
 import com.progetto.nomeprogetto.Adapters.WishlistAdapter
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.ProductDetailFragment
@@ -41,7 +40,7 @@ class CartFragment : Fragment(), CartAdapterListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCartBinding.inflate(inflater)
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -115,20 +114,20 @@ class CartFragment : Fragment(), CartAdapterListener {
 
     private fun setProducts(userId: Int, productList: ArrayList<Product>,type: Int){
         productList.clear()
-        var query = ""
+        val query: String
         if(type==0) //cart
             query = "SELECT ci.id as itemId,ci.quantity,pc.stock,pc.color,pc.color_hex,p.id,name,description,price," +
                 "width,height,length,main_picture_path,upload_date,pp.picture_path,ci.color_id," +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count, " +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
-                "FROM products p, cart_items ci,product_colors pc,product_pictures pp WHERE ci.user_id=$userId and pc.id = ci.color_id " +
-                "and pp.picture_index=0 and pp.color_id=pc.id;"
+                "FROM products p, cart_items ci,product_colors pc,product_pictures pp WHERE ci.user_id=$userId " +
+                "and pc.id = ci.color_id and pp.picture_index=0 and pp.color_id=pc.id and p.id = pp.product_id;"
         else query = "SELECT wi.id as itemId,wi.user_id,pc.color,pc.color_hex,pp.picture_path,p.id,name,description,price,width,height," +
                 "length,main_picture_path,upload_date,wi.color_id, " +
                 "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
                 "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
-                "FROM products p, wishlist_items wi,product_colors pc,product_pictures pp WHERE wi.user_id=1 " +
-                "and pc.id = wi.color_id and pp.picture_index=0 and pp.color_id=pc.id"
+                "FROM products p, wishlist_items wi,product_colors pc,product_pictures pp WHERE wi.user_id=$userId " +
+                "and pc.id = wi.color_id and pp.picture_index=0 and pp.color_id=pc.id and p.id = pp.product_id;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -164,14 +163,14 @@ class CartFragment : Fragment(), CartAdapterListener {
                             }
                             var main_picture : Bitmap? = null
                             var picture : Bitmap? = null
-                            for(i in 0..1) {
-                                ClientNetwork.retrofit.image(if (i==0) main_picture_path else picture_path).enqueue(object : Callback<ResponseBody> {
+                            for(j in 0..1) {
+                                ClientNetwork.retrofit.image(if (j==0) main_picture_path else picture_path).enqueue(object : Callback<ResponseBody> {
                                         override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                                             if (response.isSuccessful) {
                                                 if (response.body() != null) {
-                                                    if(i==0) main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
+                                                    if(j==0) main_picture = BitmapFactory.decodeStream(response.body()?.byteStream())
                                                     else picture = BitmapFactory.decodeStream(response.body()?.byteStream())
-                                                    if(i==1) {
+                                                    if(j==1) {
                                                         val product = Product(id, name, description, price, width, height,
                                                             length, main_picture, avgRating, reviewsNumber, uploadDate,
                                                             itemId, color, color_hex, quantity, stock, picture,colorId)
