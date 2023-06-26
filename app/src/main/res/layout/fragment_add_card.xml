@@ -12,10 +12,7 @@
         android:background="@color/blackPart"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:padding="15dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/back_button"
@@ -58,25 +55,48 @@
         android:drawableTint="@color/redPart"
         android:hint="Numero carta"
         android:inputType="number"
-        app:layout_constraintBottom_toTopOf="@+id/expiration_date"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardholder_name" />
 
-    <EditText
-        android:id="@+id/expiration_date"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:paddingVertical="20dp"
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/ic_date"
-        android:drawableTint="@color/redPart"
-        android:hint="Data scadenza"
-        android:inputType="date"
         app:layout_constraintBottom_toTopOf="@+id/cvv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/card_number" />
+        app:layout_constraintTop_toBottomOf="@+id/card_number">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_date"
+            android:drawableTint="@color/redPart"
+            android:text=" Data di scadenza"
+            android:textSize="18dp"
+            tools:layout_editor_absoluteX="11dp"
+            tools:layout_editor_absoluteY="378dp" />
+
+        <Spinner
+            android:id="@+id/month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="189dp"
+            tools:layout_editor_absoluteY="378dp" />
+
+        <Spinner
+            android:id="@+id/year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="225dp"
+            tools:layout_editor_absoluteY="436dp" />
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/cvv"
@@ -85,12 +105,13 @@
         android:drawableLeft="@drawable/ic_card"
         android:drawableTint="@color/redPart"
         android:hint="CVV"
-        android:inputType="numberSigned"
+        android:inputType="number"
+        android:maxLength="3"
         app:layout_constraintBottom_toTopOf="@+id/save_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/expiration_date" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
 
     <Button
         android:id="@+id/save_button"

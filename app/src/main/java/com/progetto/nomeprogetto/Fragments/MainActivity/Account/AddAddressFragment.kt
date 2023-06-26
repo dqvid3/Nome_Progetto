@@ -1,7 +1,6 @@
 package com.progetto.nomeprogetto.Fragments.MainActivity.Account
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,25 +9,23 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.progetto.nomeprogetto.Activities.MainActivity
 import com.progetto.nomeprogetto.ClientNetwork
-import com.progetto.nomeprogetto.Objects.User
 import com.progetto.nomeprogetto.Objects.UserAddress
 import com.progetto.nomeprogetto.R
-import com.progetto.nomeprogetto.databinding.FragmentAddShippingAddressBinding
+import com.progetto.nomeprogetto.databinding.FragmentAddAddressBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class AddShippingAddressFragment : Fragment() {
+class AddAddressFragment : Fragment() {
 
-    private lateinit var binding: FragmentAddShippingAddressBinding
+    private lateinit var binding: FragmentAddAddressBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentAddShippingAddressBinding.inflate(inflater)
+        binding = FragmentAddAddressBinding.inflate(inflater)
 
         binding.saveButton.setOnClickListener {
             val name = binding.name.text.toString()

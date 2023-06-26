@@ -20,14 +20,14 @@ class AccountFragment : Fragment() {
 
         binding.addPayment.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .add(R.id.home_fragment_container, AddPaymentMethodFragment())
+                .add(R.id.home_fragment_container, AddCardFragment())
                 .hide(this)
                 .commit()
         }
 
         binding.addAddress.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .add(R.id.home_fragment_container, AddShippingAddressFragment())
+                .add(R.id.home_fragment_container, AddAddressFragment())
                 .hide(this)
                 .commit()
         }
