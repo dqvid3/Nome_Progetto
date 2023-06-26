@@ -41,8 +41,7 @@ class RegisterFragment : Fragment() {
             val surname = binding.surname.text.toString().trim()
             val email = binding.email.text.toString().trim()
             val password = binding.password.text.toString().trim()
-            val address = binding.address.text.toString().trim()
-            if(name.isEmpty() || surname.isEmpty() || username.isEmpty() || address.isEmpty() ||email.isEmpty() || password.isEmpty())
+            if(name.isEmpty() || surname.isEmpty() || username.isEmpty() ||email.isEmpty() || password.isEmpty())
                 Toast.makeText(requireContext(), "Perfavore riempi tutti i campi", Toast.LENGTH_SHORT).show()
             else{
                 userExists(email, username) {exists ->
@@ -51,7 +50,7 @@ class RegisterFragment : Fragment() {
                     else if(exists==2)
                         Toast.makeText(requireContext(), "Email inserita già esistente", Toast.LENGTH_SHORT).show()
                     else if(exists==0){
-                        val  user = User(username,name,surname,email,address,password)
+                        val  user = User(username,name,surname,email,password)
                         registerUser(user)
                     }
                 }
@@ -97,9 +96,9 @@ class RegisterFragment : Fragment() {
     }
 
     private fun registerUser(user: User){
-        val query = "INSERT INTO users (username, name, surname, email, password, salt, picture_path, address)\n" +
+        val query = "INSERT INTO users (username, name, surname, email, password)\n" +
                 "VALUES ('${user.username}', '${user.name}', '${user.surname}'," +
-                " '${user.email}', '${user.password}', '', '', '${user.address}');"
+                " '${user.email}', '${user.password}');"
 
         ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {

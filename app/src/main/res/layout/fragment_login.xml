@@ -79,8 +79,10 @@
 
         <Button
             android:id="@+id/loginButton"
-            android:layout_width="273dp"
-            android:layout_height="70dp"
+            android:paddingHorizontal="100dp"
+            android:paddingVertical="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:backgroundTint="@color/redPart"
             android:text="Accedi"
             app:cornerRadius="26dp"

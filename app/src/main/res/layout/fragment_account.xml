@@ -1,135 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blackPart">
 
     <Button
-        android:id="@+id/button3"
-        android:layout_width="500dp"
-        android:layout_height="55dp"
+        android:id="@+id/add_payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/redPart"
-        android:text="Metodo di pagamento"
-        app:layout_constraintBottom_toTopOf="@+id/button4"
+        android:text="Aggiungi una carta"
+        app:layout_constraintBottom_toTopOf="@+id/order_history"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button5" />
+        app:layout_constraintTop_toBottomOf="@+id/add_address" />
 
     <Button
-        android:id="@+id/button4"
-        android:layout_width="500dp"
-        android:layout_height="55dp"
+        android:id="@+id/add_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/redPart"
-        android:text="Indirizzo di spedizione"
-        app:layout_constraintBottom_toTopOf="@+id/button6"
+        android:text="Aggiungi un indirizzo"
+        app:layout_constraintBottom_toTopOf="@+id/add_payment"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
+        app:layout_constraintTop_toBottomOf="@+id/modify_data" />
 
     <Button
-        android:id="@+id/button5"
-        android:layout_width="500dp"
-        android:layout_height="55dp"
+        android:id="@+id/modify_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/redPart"
         android:text="Modifica Dati Personali"
-        app:layout_constraintBottom_toTopOf="@+id/button3"
+        app:layout_constraintBottom_toTopOf="@+id/add_address"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     <Button
-        android:id="@+id/button6"
-        android:layout_width="500dp"
-        android:layout_height="55dp"
+        android:id="@+id/order_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/redPart"
         android:text="Cronologia Ordini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button4" />
+        app:layout_constraintTop_toBottomOf="@+id/add_payment" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="379dp"
-        android:layout_height="359dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/modify_data"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.043">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView4"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/redPart"
-            android:text=" Account"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="35sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textViewNome"
-            android:layout_width="420dp"
-            android:layout_height="40dp"
-            android:background="@android:color/darker_gray"
-            android:gravity="center_vertical"
-            android:text=" Nome:"
-            android:textAllCaps="true"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:translationX="0dp"
-            android:translationY="60dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/redPart"
+                android:text="Account"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="35sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/textViewCognome"
-            android:layout_width="420dp"
-            android:layout_height="40dp"
-            android:background="@android:color/darker_gray"
-            android:gravity="center_vertical"
-            android:text=" Cognome:"
-            android:textAllCaps="true"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:translationX="0dp"
-            android:translationY="100dp" />
+            <TextView
+                android:id="@+id/textViewNome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text=" Nome:"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/textViewIndirizzo"
-            android:layout_width="420dp"
-            android:layout_height="40dp"
-            android:background="@android:color/darker_gray"
-            android:gravity="center_vertical"
-            android:text=" Indirizzo:"
-            android:textAllCaps="true"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:translationX="0dp"
-            android:translationY="140dp" />
+            <TextView
+                android:id="@+id/textViewCognome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text=" Cognome:"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/emailTextView"
-            android:layout_width="420dp"
-            android:layout_height="40dp"
-            android:background="@android:color/darker_gray"
-            android:gravity="center_vertical"
-            android:text=" Email:"
-            android:textAllCaps="true"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:translationX="0dp"
-            android:translationY="180dp" />
-
-
+            <TextView
+                android:id="@+id/emailTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text=" Email:"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

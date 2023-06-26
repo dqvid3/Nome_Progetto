@@ -19,7 +19,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CartAdapter(private var productList: List<Product>,private val listener: CartAdapterListener,private val userId: Int?) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+class CartAdapter(private val productList: List<Product>,private val listener: CartAdapterListener,private val userId: Int?) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 
@@ -60,7 +60,6 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
             holder.qtyLayout.visibility = View.GONE
             holder.noStock.visibility = View.VISIBLE
         }
-
         val quantityOptions = (1..product.stock!!).toList()
         val adapter = ArrayAdapter(holder.itemView.context, R.layout.simple_spinner_item, quantityOptions)
         adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
@@ -68,13 +67,13 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
         holder.spinnerQty.setSelection(product.quantity!!-1)
         holder.spinnerQty.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             var isInitialSelection = true
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, p: Int, id: Long) {
                 if(isInitialSelection){
                     isInitialSelection = false
                     return
                 }
-                val selectedQuantity = quantityOptions[position]
-                product.itemId?.let { updateCart(it,selectedQuantity,holder.itemView.context) }
+                val selectedQuantity = quantityOptions[p]
+                updateCart(position,selectedQuantity,holder.itemView.context)
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -100,7 +99,7 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
     }
 
     private fun removeItem(position: Int) {
-        productList = productList.toMutableList().apply { removeAt(position) }
+        productList.toMutableList().apply { removeAt(position) }
         notifyItemRemoved(position)
         if (productList.isEmpty())
             listener.restoreCart()
@@ -108,12 +107,15 @@ class CartAdapter(private var productList: List<Product>,private val listener: C
             notifyItemRangeChanged(position, productList.size)
     }
 
-    private fun updateCart(itemId: Int,quantity: Int,context: Context){
-        var query = "UPDATE cart_items set quantity=$quantity where id=$itemId;"
+    private fun updateCart(position: Int,quantity: Int,context: Context){
+        val product = productList[position]
+        var query = "UPDATE cart_items set quantity=$quantity where id=${product.itemId};"
 
         ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
-            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) =
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                product.quantity = quantity
                 Toast.makeText(context, "Quantità aggiornata", Toast.LENGTH_LONG).show()
+            }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
         })

@@ -37,6 +37,7 @@ class CartFragment : Fragment(), CartAdapterListener {
     }
 
     private lateinit var binding: FragmentCartBinding
+    private val productList = ArrayList<Product>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,10 +45,12 @@ class CartFragment : Fragment(), CartAdapterListener {
     ): View {
         binding = FragmentCartBinding.inflate(inflater)
 
+        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("ID", 0)
+
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val itemDecoration = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         binding.recyclerView.addItemDecoration(itemDecoration)
-        loadCart()
 
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -56,10 +59,10 @@ class CartFragment : Fragment(), CartAdapterListener {
                 binding.buyButton.visibility = View.GONE
                 if(position==0){ // 0 -> Cart
                     binding.emptyCart.text = "Non hai articoli nel carrello"
-                    loadCart()
+                    loadCart(userId)
                 }else if(position==1){ // 1 -> WishList
                     binding.emptyCart.text = "Non hai articoli nella wishlist"
-                    loadWishList()
+                    loadWishList(userId)
                 }
             }
             override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -67,62 +70,50 @@ class CartFragment : Fragment(), CartAdapterListener {
         })
 
         binding.buyButton.setOnClickListener{
-
+            setProducts(userId,2)
         }
 
         return binding.root
     }
 
-    private fun loadCart(){
+    private fun loadCart(userId: Int){
         binding.emptyCart.text = "Non hai articoli nel carrello"
-        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val userId = sharedPref.getInt("ID", 0)
-        val productList = ArrayList<Product>()
+        setProducts(userId,0)
+
         val adapter = CartAdapter(productList,this,userId)
-
         binding.recyclerView.adapter = adapter
-        setProducts(userId,productList,0)
-
         adapter.setOnClickListener(object: CartAdapter.OnClickListener{
-            override fun onClick(product: Product) {
-                val bundle = Bundle()
-                bundle.putParcelable("product", product)
-                val productDetailFragment = ProductDetailFragment()
-                productDetailFragment.arguments = bundle
-                parentFragmentManager.beginTransaction().hide(this@CartFragment)
-                    .add(R.id.home_fragment_container,productDetailFragment)
-                    .commit()
-            }
+            override fun onClick(product: Product) =
+                setOnClick(product)
         })
     }
 
-    private fun loadWishList(){
+    private fun loadWishList(userId: Int){
         binding.emptyCart.text = "Non hai articoli nella wishlist"
-        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        val userId = sharedPref.getInt("ID", 0)
-        val productList = ArrayList<Product>()
+        setProducts(userId,1)
+
         val adapter = WishlistAdapter(productList,this,userId)
-
         binding.recyclerView.adapter = adapter
-        setProducts(userId,productList,1)
-
         adapter.setOnClickListener(object: WishlistAdapter.OnClickListener{
-            override fun onClick(product: Product) {
-                val bundle = Bundle()
-                bundle.putParcelable("product", product)
-                val productDetailFragment = ProductDetailFragment()
-                productDetailFragment.arguments = bundle
-                parentFragmentManager.beginTransaction().hide(this@CartFragment)
-                    .add(R.id.home_fragment_container,productDetailFragment)
-                    .commit()
-            }
+            override fun onClick(product: Product) =
+                setOnClick(product)
         })
     }
 
-    private fun setProducts(userId: Int, productList: ArrayList<Product>,type: Int){
+    private fun setOnClick(product: Product){
+        val bundle = Bundle()
+        bundle.putParcelable("product", product)
+        val productDetailFragment = ProductDetailFragment()
+        productDetailFragment.arguments = bundle
+        parentFragmentManager.beginTransaction().hide(this@CartFragment)
+            .add(R.id.home_fragment_container,productDetailFragment)
+            .commit()
+    }
+
+    private fun setProducts(userId: Int,type: Int){
         productList.clear()
         val query: String
-        if(type==0) //cart
+        if(type==0 || type==2) //cart
             query = "SELECT ci.id as itemId,ci.quantity,pc.stock,pc.color,pc.color_hex,p.id,name,description,price," +
                     "width,height,length,main_picture_path,upload_date,pp.picture_path,ci.color_id," +
                     "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count, " +
@@ -164,9 +155,18 @@ class CartFragment : Fragment(), CartAdapterListener {
                             val colorId = productObject.get("color_id").asInt
                             var stock: Int? = null
                             var quantity: Int? = null
-                            if(type == 0){
+                            if(type == 0 || type == 2){
                                 stock = productObject.get("stock").asInt
                                 quantity = productObject.get("quantity").asInt
+                                if (stock>0 && quantity>stock){
+                                    quantity = stock
+                                    var query = "UPDATE cart_items set quantity=$quantity where id=$itemId;"
+                                    ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
+                                        override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
+                                        override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                                            Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                    })
+                                }
                             }
                             var main_picture : Bitmap? = null
                             var picture : Bitmap? = null
@@ -184,10 +184,24 @@ class CartFragment : Fragment(), CartAdapterListener {
                                                     productList.add(product)
                                                     loadedProducts++
                                                     if (loadedProducts == productsArray.size()) {
-                                                        if(type==0) binding.buyButton.visibility = View.VISIBLE
+                                                        if(type==0 || type==2) binding.buyButton.visibility = View.VISIBLE
                                                         binding.emptyCart.visibility = View.GONE
                                                         binding.recyclerView.visibility = View.VISIBLE
                                                         binding.recyclerView.adapter?.notifyDataSetChanged()
+                                                        if (type == 2) {
+                                                            var totalAmt = 0.0
+                                                            val orderList = ArrayList<Product>()
+                                                            for (product in productList) {
+                                                                if (product.stock != null && product.stock > 0) {
+                                                                    orderList.add(product)
+                                                                    totalAmt += product.price * (product.quantity ?: 0)
+                                                                }
+                                                            }
+                                                            if(orderList.size>0)
+                                                                createOrder(orderList,totalAmt,userId)
+                                                            else
+                                                                Toast.makeText(requireContext(), "Non hai articoli acquistabili nel carrello" , Toast.LENGTH_LONG).show()
+                                                        }
                                                     }
                                                 }
                                             }
@@ -206,14 +220,41 @@ class CartFragment : Fragment(), CartAdapterListener {
         })
     }
 
+    private fun createOrder(orderList: ArrayList<Product>,totalAmt: Double, userId: Int){
+        var query = "INSERT INTO orders (user_id,totalAmount,payment_id,address_id) VALUES ($userId,$totalAmt,,);"
+
+        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    println(response.body()?.asString)
+                    /*for(product in orderList){
+                        query = "INSERT INTO order_items (order_id,color_id,quantity,price) " +
+                                "VALUES ($userId,$totalAmt);"
+
+                        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
+                            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                        })
+                    }
+                    Toast.makeText(context, "Articolo aggiunto alla wishlist", Toast.LENGTH_SHORT)
+                        .show()*/
+                }
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
     override fun onResume() {
         super.onResume()
+        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("ID", 0)
         when(binding.tabLayout.selectedTabPosition){
             0 -> {
-                loadCart()
+                loadCart(userId)
             }
             1 -> {
-                loadWishList()
+                loadWishList(userId)
             }
         }
     }

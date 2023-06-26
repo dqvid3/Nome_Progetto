@@ -7,10 +7,10 @@ import android.view.View
 import android.widget.EditText
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView.SearchAutoComplete
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.progetto.nomeprogetto.Fragments.MainActivity.*
+import com.progetto.nomeprogetto.Fragments.MainActivity.Account.AccountFragment
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.HomeFragment
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.ProductFragment
 import com.progetto.nomeprogetto.R
@@ -56,15 +56,13 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun openFragment(fragment: Fragment){
-        if (fragment is CartFragment)
-            supportFragmentManager.beginTransaction()
-                .replace(binding.homeFragmentContainer.id, fragment,"CartFragment")
-                .commit()
-        else
-            supportFragmentManager.beginTransaction()
-                .replace(binding.homeFragmentContainer.id, fragment)
-                .commit()
+    private fun openFragment(fragment: Fragment,fragmentTag: String){
+        if (fragmentTag.equals("AccountFragment"))
+            binding.searchView.visibility = View.GONE
+        else binding.searchView.visibility = View.VISIBLE
+        supportFragmentManager.beginTransaction()
+            .replace(binding.homeFragmentContainer.id, fragment, fragmentTag)
+            .commit()
         supportFragmentManager.findFragmentById(binding.homeFragmentHomeContainer.id)?.let {
             supportFragmentManager.beginTransaction()
                 .remove(it)
@@ -88,15 +86,15 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_cart -> {
-                    openFragment(CartFragment())
+                    openFragment(CartFragment(),"CartFragment")
                     true
                 }
                 R.id.navigation_account -> {
-                    openFragment(AccountFragment())
+                    openFragment(AccountFragment(),"AccountFragment")
                     true
                 }
                 R.id.navigation_settings -> {
-                    openFragment(SettingsFragment())
+                    openFragment(SettingsFragment(),"SettingsFragment")
                     true
                 }
                 else -> false

@@ -21,7 +21,7 @@ class Product(
     val itemId: Int? = null,
     val colorName: String? = null,
     val color_hex: String? = null,
-    val quantity: Int? = null,
+    var quantity: Int? = null,
     val stock: Int? = null,
     val picture: Bitmap? = null,
     val colorId: Int? = null,
