@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/address_text"
@@ -22,53 +20,81 @@
         android:id="@+id/layout_indirizzo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:padding="10dp"
         android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/modify_address"
-        app:layout_constraintStart_toEndOf="@+id/address_text"
-        app:layout_constraintTop_toTopOf="parent">
-
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/address_text">
         <TextView
+            android:padding="5dp"
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nome"
+            android:text="Name"
             android:textColor="@color/black"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/address_line1"
+            android:textStyle="bold"/>
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Via linea 1"
-            android:textColor="@color/black"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/address_line2"
+            android:orientation="horizontal">
+            <TextView
+                android:padding="5dp"
+                android:id="@+id/address_line1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address line 1"/>
+            <TextView
+                android:padding="5dp"
+                android:id="@+id/address_line2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address line 2"/>
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Via linea 2"
-            android:textColor="@color/black"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/city_county_cap"
+            android:orientation="horizontal">
+            <TextView
+                android:padding="5dp"
+                android:id="@+id/city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Città"/>
+            <TextView
+                android:padding="5dp"
+                android:id="@+id/county"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Provincia"/>
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Città, Provincia CAP"
-            android:textColor="@color/black"
-            android:textSize="14dp" />
-
+            android:orientation="horizontal">
+            <TextView
+                android:padding="5dp"
+                android:id="@+id/cap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CAP"/>
+            <TextView
+                android:padding="5dp"
+                android:id="@+id/state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stato"/>
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/modify_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_settings"
+        android:drawableTint="@android:color/darker_gray"
         android:padding="8dp"
-        android:text="Modifica"
+        android:text=" Modifica"
         android:textColor="@android:color/holo_blue_light"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
@@ -76,17 +102,17 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/address_list_layout"
-        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
+        android:visibility="gone"
         app:cardCornerRadius="10dp"
-        app:strokeColor="@color/black"
-        app:strokeWidth="0.5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/address_text">
+        app:layout_constraintTop_toBottomOf="@+id/address_text"
+        app:strokeColor="@color/black"
+        app:strokeWidth="0.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -106,13 +132,12 @@
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
-                app:dividerColor="@color/black"
-                android:layout_marginVertical="5dp" />
+                android:layout_marginVertical="5dp"
+                app:dividerColor="@color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerAddressView"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="5dp" />
 
@@ -120,9 +145,9 @@
                 android:id="@+id/add_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
                 android:drawableLeft="@drawable/ic_plus"
                 android:drawableTint="@android:color/darker_gray"
+                android:padding="2dp"
                 android:text=" Aggiungi un nuovo indirizzo"
                 android:textColor="@android:color/holo_blue_light"
                 android:textStyle="italic"
