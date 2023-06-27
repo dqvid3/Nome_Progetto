@@ -1,6 +1,7 @@
 package com.progetto.nomeprogetto.Fragments.MainActivity
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.JsonObject
+import com.progetto.nomeprogetto.Activities.BuyActivity
+import com.progetto.nomeprogetto.Activities.MainActivity
 import com.progetto.nomeprogetto.Adapters.CartAdapter
 import com.progetto.nomeprogetto.Adapters.CartAdapterListener
 import com.progetto.nomeprogetto.Adapters.WishlistAdapter
@@ -70,7 +73,15 @@ class CartFragment : Fragment(), CartAdapterListener {
         })
 
         binding.buyButton.setOnClickListener{
-            setProducts(userId,2)
+            var atleastOneProduct = false
+            for(product in productList) {
+                if (product.stock != null && product.stock > 0)
+                    atleastOneProduct = true
+            }
+            if (atleastOneProduct)
+                startActivity(Intent(requireContext(), BuyActivity::class.java))
+            else
+                Toast.makeText(requireContext(), "Non hai articoli disponibili nel carrello", Toast.LENGTH_LONG).show()
         }
 
         return binding.root
@@ -112,8 +123,8 @@ class CartFragment : Fragment(), CartAdapterListener {
 
     private fun setProducts(userId: Int,type: Int){
         productList.clear()
-        val query: String
-        if(type==0 || type==2) //cart
+        var query: String
+        if(type==0) //cart
             query = "SELECT ci.id as itemId,ci.quantity,pc.stock,pc.color,pc.color_hex,p.id,name,description,price," +
                     "width,height,length,main_picture_path,upload_date,pp.picture_path,ci.color_id," +
                     "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count, " +
@@ -155,12 +166,12 @@ class CartFragment : Fragment(), CartAdapterListener {
                             val colorId = productObject.get("color_id").asInt
                             var stock: Int? = null
                             var quantity: Int? = null
-                            if(type == 0 || type == 2){
+                            if(type == 0){
                                 stock = productObject.get("stock").asInt
                                 quantity = productObject.get("quantity").asInt
                                 if (stock>0 && quantity>stock){
                                     quantity = stock
-                                    var query = "UPDATE cart_items set quantity=$quantity where id=$itemId;"
+                                    query = "UPDATE cart_items set quantity=$quantity where id=$itemId;"
                                     ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
                                         override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
                                         override fun onFailure(call: Call<JsonObject>, t: Throwable) =
@@ -184,24 +195,10 @@ class CartFragment : Fragment(), CartAdapterListener {
                                                     productList.add(product)
                                                     loadedProducts++
                                                     if (loadedProducts == productsArray.size()) {
-                                                        if(type==0 || type==2) binding.buyButton.visibility = View.VISIBLE
+                                                        if(type==0) binding.buyButton.visibility = View.VISIBLE
                                                         binding.emptyCart.visibility = View.GONE
                                                         binding.recyclerView.visibility = View.VISIBLE
                                                         binding.recyclerView.adapter?.notifyDataSetChanged()
-                                                        if (type == 2) {
-                                                            var totalAmt = 0.0
-                                                            val orderList = ArrayList<Product>()
-                                                            for (product in productList) {
-                                                                if (product.stock != null && product.stock > 0) {
-                                                                    orderList.add(product)
-                                                                    totalAmt += product.price * (product.quantity ?: 0)
-                                                                }
-                                                            }
-                                                            if(orderList.size>0)
-                                                                createOrder(orderList,totalAmt,userId)
-                                                            else
-                                                                Toast.makeText(requireContext(), "Non hai articoli acquistabili nel carrello" , Toast.LENGTH_LONG).show()
-                                                        }
                                                     }
                                                 }
                                             }
@@ -220,31 +217,6 @@ class CartFragment : Fragment(), CartAdapterListener {
         })
     }
 
-    private fun createOrder(orderList: ArrayList<Product>,totalAmt: Double, userId: Int){
-        var query = "INSERT INTO orders (user_id,totalAmount,payment_id,address_id) VALUES ($userId,$totalAmt,,);"
-
-        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
-            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                if (response.isSuccessful) {
-                    println(response.body()?.asString)
-                    /*for(product in orderList){
-                        query = "INSERT INTO order_items (order_id,color_id,quantity,price) " +
-                                "VALUES ($userId,$totalAmt);"
-
-                        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
-                            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
-                            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
-                                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-                        })
-                    }
-                    Toast.makeText(context, "Articolo aggiunto alla wishlist", Toast.LENGTH_SHORT)
-                        .show()*/
-                }
-            }
-            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
-                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
-        })
-    }
     override fun onResume() {
         super.onResume()
         val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)

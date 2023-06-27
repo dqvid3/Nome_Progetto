@@ -66,14 +66,14 @@ class RegisterFragment : Fragment() {
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if (response.isSuccessful) {
-                    val resultSetSize = (response.body()?.get("queryset") as JsonArray).size()
+                    var resultSetSize = (response.body()?.get("queryset") as JsonArray).size()
                     if(resultSetSize==1) callback(1)
                     else{ //se non esiste un utente con quell'username
                         query = "SELECT id FROM users WHERE email = '$email';"
                         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
                             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                                 if (response.isSuccessful) {
-                                    val resultSetSize = (response.body()?.get("queryset") as JsonArray).size()
+                                    resultSetSize = (response.body()?.get("queryset") as JsonArray).size()
                                     if(resultSetSize==1) callback(2)
                                     else callback(0)
                                 } else
@@ -96,18 +96,32 @@ class RegisterFragment : Fragment() {
     }
 
     private fun registerUser(user: User){
-        val query = "INSERT INTO users (username, name, surname, email, password)\n" +
+        var query = "INSERT INTO users (username, name, surname, email, password)\n" +
                 "VALUES ('${user.username}', '${user.name}', '${user.surname}'," +
                 " '${user.email}', '${user.password}');"
 
         ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if(response.isSuccessful) {
-                    Toast.makeText(requireContext(), "Registrazione avvenuta con successo",Toast.LENGTH_SHORT).show()
-                    val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-                    sharedPref.edit().putBoolean("IS_LOGGED_IN", true).apply()
-                    startActivity(Intent(requireContext(), MainActivity::class.java))
-                    requireActivity().finish()
+                    query = "SELECT id FROM users WHERE username = '${user.username}';"
+                    ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+                        override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                            if (response.isSuccessful) {
+                                var userObject = response.body()?.get("queryset") as JsonArray
+                                val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+                                sharedPref.edit().putBoolean("IS_LOGGED_IN", true)
+                                    .putInt("ID",userObject[0].asJsonObject.get("id").asInt)
+                                    .apply()
+
+                                startActivity(Intent(requireContext(), MainActivity::class.java))
+                                requireActivity().finish()
+                                Toast.makeText(requireContext(), "Registrazione avvenuta con successo",Toast.LENGTH_SHORT).show()
+                            }else
+                                Toast.makeText(requireContext(), "Errore nell'effettuare la registrazione, riprova",Toast.LENGTH_SHORT).show()
+                        }
+                        override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                            Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                    })
                 }else Toast.makeText(requireContext(), "Errore nell'effettuare la registrazione, riprova",Toast.LENGTH_SHORT).show()
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {

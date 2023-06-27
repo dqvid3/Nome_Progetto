@@ -1,6 +1,7 @@
 package com.progetto.nomeprogetto.Adapters
 
 import android.R
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -47,7 +48,7 @@ class CartAdapter(private val productList: List<Product>,private val listener: C
         return productList.size
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val product = productList[position]
 
         holder.imageView.setImageBitmap(product.picture)
@@ -99,10 +100,11 @@ class CartAdapter(private val productList: List<Product>,private val listener: C
     }
 
     private fun removeItem(position: Int) {
-        productList.toMutableList().apply { removeAt(position) }
+        (productList as MutableList<Product>).removeAt(position)
         notifyItemRemoved(position)
-        if (productList.isEmpty())
+        if (productList.isEmpty()) {
             listener.restoreCart()
+        }
         else
             notifyItemRangeChanged(position, productList.size)
     }

@@ -190,7 +190,7 @@ class ProductDetailFragment : Fragment() {
                         }
                     }else{ //se non esiste nel carrello lo aggiungo
                         query = "INSERT INTO cart_items (user_id,quantity,color_id) VALUES ($userId,$qty,$colorId);"
-
+                        println(query)
                         ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
                             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                                 if (response.isSuccessful)
