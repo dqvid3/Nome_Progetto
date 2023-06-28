@@ -20,7 +20,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CartAdapter(private val productList: List<Product>,private val listener: CartAdapterListener,private val userId: Int?) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+class CartAdapter(private val productList: List<Product>,private val listener: CartAdapterListener?,private val userId: Int?) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 
@@ -65,7 +65,9 @@ class CartAdapter(private val productList: List<Product>,private val listener: C
         val adapter = ArrayAdapter(holder.itemView.context, R.layout.simple_spinner_item, quantityOptions)
         adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
         holder.spinnerQty.adapter = adapter
-        holder.spinnerQty.setSelection(product.quantity!!-1)
+        val quantityIndex = quantityOptions.indexOf(product.quantity)
+        if (quantityIndex != -1)
+            holder.spinnerQty.setSelection(quantityIndex)
         holder.spinnerQty.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             var isInitialSelection = true
             override fun onItemSelected(parent: AdapterView<*>, view: View?, p: Int, id: Long) {
@@ -79,7 +81,10 @@ class CartAdapter(private val productList: List<Product>,private val listener: C
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
         holder.removeProduct.setOnClickListener{
-            product.itemId?.let { removeFromCart(it,position,holder.itemView.context) }
+            if (listener==null && productList.size==1)
+                Toast.makeText(holder.itemView.context, "Non puoi rimuovere l'ultimo articolo che rimane", Toast.LENGTH_LONG).show()
+            else
+                product.itemId?.let { removeFromCart(it,position,holder.itemView.context) }
         }
 
         holder.addToWish.setOnClickListener{
@@ -103,9 +108,8 @@ class CartAdapter(private val productList: List<Product>,private val listener: C
         (productList as MutableList<Product>).removeAt(position)
         notifyItemRemoved(position)
         if (productList.isEmpty()) {
-            listener.restoreCart()
-        }
-        else
+            listener?.restoreCart()
+        } else
             notifyItemRangeChanged(position, productList.size)
     }
 

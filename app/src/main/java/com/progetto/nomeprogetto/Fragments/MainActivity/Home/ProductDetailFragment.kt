@@ -54,6 +54,7 @@ class ProductDetailFragment : Fragment() {
             arguments?.getParcelable("product", Product::class.java)
         } else
             arguments?.getParcelable("product")
+
         val colorList = ArrayList<ProductColor>()
         val imageList = HashMap<Int, Bitmap>()
         val reviewList = ArrayList<ProductReview>()

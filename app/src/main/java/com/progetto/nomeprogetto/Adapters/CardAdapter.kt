@@ -9,62 +9,53 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Activities.BuyActivity
 import com.progetto.nomeprogetto.ClientNetwork
-import com.progetto.nomeprogetto.Fragments.MainActivity.Account.AddAddressFragment
-import com.progetto.nomeprogetto.Objects.Product
-import com.progetto.nomeprogetto.Objects.UserAddress
+import com.progetto.nomeprogetto.Fragments.MainActivity.Account.AddCardFragment
+import com.progetto.nomeprogetto.Objects.UserCard
 import com.progetto.nomeprogetto.R
-import com.progetto.nomeprogetto.databinding.AddressViewDesignBinding
+import com.progetto.nomeprogetto.databinding.CardViewDesignBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class AddressAdapter(private var addressList: ArrayList<UserAddress>) : RecyclerView.Adapter<AddressAdapter.ViewHolder>() {
+class CardAdapter(private var cardList: ArrayList<UserCard>) : RecyclerView.Adapter<CardAdapter.ViewHolder>() {
 
     private var lastSelectedPosition = RecyclerView.NO_POSITION
-    class ViewHolder(binding: AddressViewDesignBinding) : RecyclerView.ViewHolder(binding.root) {
-        val name = binding.name
-        val addressLine1 = binding.addressLine1
-        val addressLine2 = binding.addressLine2
-        val city = binding.city
-        val county = binding.county
-        val cap = binding.cap
-        val state = binding.state
-        val selectButton = binding.selectButton
+
+    class ViewHolder(binding: CardViewDesignBinding) : RecyclerView.ViewHolder(binding.root) {
+        val cardholderName = binding.cardholderName
+        val cardNumber = binding.cardNumber
+        val expirationDate = binding.expirationDate
         val layout = binding.layout
-        val modifyAddress = binding.modifyAddress
-        val removeAddress = binding.removeAddress
+        val selectButton = binding.selectButton
+        val modifyCard = binding.modifyCard
+        val removeCard = binding.removeCard
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = AddressViewDesignBinding.inflate(
+        val view = CardViewDesignBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         return ViewHolder(view)
     }
 
     override fun getItemCount(): Int {
-        return addressList.size
+        return cardList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        val address = addressList[position]
+        val card = cardList[position]
         val context = holder.itemView.context
 
-        holder.name.text = address.name
-        holder.addressLine1.text = address.address_line1
-        holder.addressLine2.text = address.address_line2
-        holder.city.text = address.city
-        holder.county.text = address.county
-        holder.cap.text = address.cap
-        holder.state.text = address.state
-        if (address.selected) {
-            updateCurrentAddress(context,address.id)
+        holder.cardholderName.text = card.name
+        holder.cardNumber.text = card.card_number
+        holder.expirationDate.text = card.expiration_date
+        if (card.selected) {
+            updateCurrentAddress(context,card.id)
             holder.layout.setBackgroundColor(Color.parseColor("#D9EBFA"))
             lastSelectedPosition = position
             holder.selectButton.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.redPart))
@@ -72,23 +63,23 @@ class AddressAdapter(private var addressList: ArrayList<UserAddress>) : Recycler
             holder.selectButton.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.notSelected))
         holder.selectButton.setOnClickListener{
             if (lastSelectedPosition != RecyclerView.NO_POSITION) {
-                addressList[lastSelectedPosition].selected = false
+                cardList[lastSelectedPosition].selected = false
                 notifyItemChanged(lastSelectedPosition)
             }
-            address.selected = true
+            card.selected = true
             notifyItemChanged(position)
             lastSelectedPosition = position
-            updateCurrentAddress(context, address.id)
+            updateCurrentAddress(context, card.id)
         }
 
         holder.itemView.setOnClickListener{
             holder.selectButton.performClick()
         }
 
-        holder.modifyAddress.setOnClickListener{
-            val fragment = AddAddressFragment()
+        holder.modifyCard.setOnClickListener{
+            val fragment = AddCardFragment()
             val bundle = Bundle()
-            bundle.putParcelable("address", address)
+            bundle.putParcelable("card", card)
             fragment.arguments = bundle
             val activity = context as? BuyActivity
             if (activity != null) {
@@ -100,18 +91,18 @@ class AddressAdapter(private var addressList: ArrayList<UserAddress>) : Recycler
             }
         }
 
-        holder.removeAddress.setOnClickListener{
-            if (addressList.size>1)
-                removeAddress(context,address.id)
+        holder.removeCard.setOnClickListener{
+            if (cardList.size>1)
+                removeCard(context,card.id)
             else
-                Toast.makeText(context, "Non puoi eliminare l'indirizzo se ne possiedi solo uno", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Non puoi eliminare la carda se ne possiedi soltanto una", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun updateCurrentAddress(context: Context,addressId: Int){
+    private fun updateCurrentAddress(context: Context, cardId: Int){
         val sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         val userId = sharedPref.getInt("ID", 0)
-        var query = "UPDATE users SET current_address_id = $addressId WHERE id=$userId;"
+        var query = "UPDATE users SET current_card_id = $cardId WHERE id=$userId;"
 
         ClientNetwork.retrofit.update(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
@@ -120,30 +111,30 @@ class AddressAdapter(private var addressList: ArrayList<UserAddress>) : Recycler
         })
     }
 
-    private fun removeAddress(context: Context,addressId: Int){
-        var query = "DELETE FROM user_addresses WHERE id=$addressId;"
+    private fun removeCard(context: Context, cardId: Int){
+        var query = "DELETE FROM user_payments WHERE id=$cardId;"
 
         ClientNetwork.retrofit.remove(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if (response.isSuccessful) {
-                    val index = addressList.indexOfFirst { it.id == addressId }
+                    val index = cardList.indexOfFirst { it.id == cardId }
                     if (index != -1) {
-                        val wasSelected = addressList[index].selected
-                        addressList.removeAt(index)
+                        val wasSelected = cardList[index].selected
+                        cardList.removeAt(index)
                         notifyItemRemoved(index)
 
                         if (wasSelected) {
                             lastSelectedPosition = RecyclerView.NO_POSITION
-                            if (addressList.isNotEmpty()) {
-                                addressList[0].selected = true
+                            if (cardList.isNotEmpty()) {
+                                cardList[0].selected = true
                                 lastSelectedPosition = 0
-                                updateCurrentAddress(context, addressList[0].id)
+                                updateCurrentAddress(context, cardList[0].id)
                                 notifyItemChanged(0)
                             }else  updateCurrentAddress(context,-1)
                         }
                     }
                 } else
-                    Toast.makeText(context, "Failed to remove address", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Failed to remove card", Toast.LENGTH_LONG).show()
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()

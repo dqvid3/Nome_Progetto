@@ -5,11 +5,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
+    <FrameLayout
+        android:visibility="gone"
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingVertical="10dp"
+        android:paddingVertical="12dp"
         android:gravity="center"
         android:background="@color/blackPart">
 
@@ -18,10 +24,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="40dp"
         app:backgroundTint="@color/redPart"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_arrow_back" />
 
         <TextView
@@ -53,26 +57,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!--
-
-            <TextView
-                android:id="@+id/payment_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2 Modalità di pagamento" />
+            <include
+                android:id="@+id/card_selection"
+                layout="@layout/card_selection"/>
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_marginVertical="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/products"
+            <include
+                android:id="@+id/order_summary"
+                layout="@layout/order_summary"/>
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:layout_marginVertical="25dp"
+                android:id="@+id/buy_button"
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3 Articoli" />
+                android:clickable="true"
+                android:layout_gravity="center"
+                app:backgroundTint="@color/redPart"
+                android:textAlignment="center"
+                android:drawableLeft="@drawable/ic_bag"
+                android:text="Acquista"/>
 
-             -->
         </LinearLayout>
 
     </ScrollView>

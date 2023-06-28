@@ -5,11 +5,11 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/address_text"
+        android:id="@+id/card_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:text="1 Indirizzo di consegna"
+        android:text="2 Metodo di pagamento"
         android:textColor="@color/black"
         android:textSize="18dp"
         android:textStyle="bold"
@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/layout_indirizzo"
+        android:id="@+id/layout_carta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
@@ -25,70 +25,62 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/address_text">
+        app:layout_constraintTop_toBottomOf="@+id/card_text">
+
         <TextView
             android:padding="5dp"
-            android:id="@+id/name"
+            android:id="@+id/card_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name"
-            android:textColor="@color/black"
-            android:textStyle="bold"/>
+            android:text="Termina con"/>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:padding="5dp"
-                android:id="@+id/address_line1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Address line 1"/>
+                android:text="Titolare "
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+
             <TextView
                 android:padding="5dp"
-                android:id="@+id/address_line2"
+                android:id="@+id/cardholder_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""/>
+                android:text="Nome titolare"/>
+
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:padding="5dp"
-                android:id="@+id/city"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Città"/>
+                android:text="Scade il "
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+
             <TextView
                 android:padding="5dp"
-                android:id="@+id/county"
+                android:id="@+id/expiration_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Provincia"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:padding="5dp"
-                android:id="@+id/cap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CAP"/>
-            <TextView
-                android:padding="5dp"
-                android:id="@+id/state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Stato"/>
+                android:text="Data di scadenza"/>
+
         </LinearLayout>
     </LinearLayout>
 
     <TextView
-        android:id="@+id/modify_address"
+        android:id="@+id/modify_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_settings"
@@ -101,7 +93,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/address_list_layout"
+        android:id="@+id/card_list_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
@@ -110,7 +102,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/address_text"
+        app:layout_constraintTop_toBottomOf="@+id/card_text"
         app:strokeColor="@color/black"
         app:strokeWidth="0.5dp">
 
@@ -120,11 +112,11 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/address_list_text"
+                android:id="@+id/card_list_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="I tuoi indirizzi"
+                android:text="Le tue carte"
                 android:textColor="@color/black"
                 android:textSize="16dp"
                 android:textStyle="bold" />
@@ -136,19 +128,19 @@
                 app:dividerColor="@color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerAddressView"
+                android:id="@+id/recyclerCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="5dp" />
 
             <TextView
-                android:id="@+id/add_address"
+                android:id="@+id/add_card"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_plus"
                 android:drawableTint="@android:color/darker_gray"
                 android:padding="2dp"
-                android:text=" Aggiungi un nuovo indirizzo"
+                android:text=" Aggiungi una nuova carta"
                 android:textColor="@android:color/holo_blue_light"
                 android:textStyle="italic"
                 app:layout_constraintEnd_toEndOf="parent"
