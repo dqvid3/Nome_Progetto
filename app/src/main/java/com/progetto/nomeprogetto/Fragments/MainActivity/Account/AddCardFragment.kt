@@ -1,5 +1,6 @@
 package com.progetto.nomeprogetto.Fragments.MainActivity.Account
 
+import android.animation.Animator
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.airbnb.lottie.LottieAnimationView
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Activities.BuyActivity
@@ -103,6 +105,15 @@ class AddCardFragment : Fragment() {
             }
         }
 
+        binding.animationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator) {}
+            override fun onAnimationEnd(p0: Animator) {
+                closeFragment()
+            }
+            override fun onAnimationCancel(p0: Animator) {}
+            override fun onAnimationRepeat(p0: Animator) {}
+        })
+
         binding.backButton.setOnClickListener{
             closeFragment()
         }
@@ -136,7 +147,7 @@ class AddCardFragment : Fragment() {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if(response.isSuccessful) {
                     Toast.makeText(requireContext(), "Carta salvata con successo",Toast.LENGTH_SHORT).show()
-                    closeFragment()
+                    startAnimation()
                 }else
                     Toast.makeText(requireContext(), "Errore nel salvataggio, riprova",Toast.LENGTH_SHORT).show()
             }
@@ -154,13 +165,19 @@ class AddCardFragment : Fragment() {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 if(response.isSuccessful) {
                     Toast.makeText(requireContext(), "Carta salvata con successo",Toast.LENGTH_SHORT).show()
-                    closeFragment()
+                    startAnimation()
                 }else
                     Toast.makeText(requireContext(), "Errore nel salvataggio, riprova",Toast.LENGTH_SHORT).show()
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                 Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
         })
+    }
+
+    private fun startAnimation(){
+        val checkAnimationView: LottieAnimationView = binding.animationView
+        binding.animationView.speed = 3.0f
+        checkAnimationView.playAnimation()
     }
 
     private fun closeFragment(){
