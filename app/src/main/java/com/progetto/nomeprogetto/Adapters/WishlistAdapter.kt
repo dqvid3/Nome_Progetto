@@ -26,6 +26,7 @@ class WishlistAdapter(private var productList: List<Product>,private val listene
         val colorName = binding.colorName
         val colorView = binding.colorView
         val removeProduct = binding.removeProduct
+        val addToCart = binding.addToCart
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -50,6 +51,10 @@ class WishlistAdapter(private var productList: List<Product>,private val listene
 
         holder.removeProduct.setOnClickListener{
             product.itemId?.let { removeFromWishlist(it,position,holder.itemView.context) }
+        }
+
+        holder.addToCart.setOnClickListener{
+            product.colorId?.let { addToWish(it, holder.itemView.context) }
         }
 
         holder.itemView.setOnClickListener {
@@ -84,4 +89,45 @@ class WishlistAdapter(private var productList: List<Product>,private val listene
         })
     }
 
+    private fun addToWish(colorId: Int,context: Context){
+        var query = "SELECT pc.stock, ci.id AS item_id " +
+                "FROM product_colors pc LEFT JOIN cart_items ci ON pc.id = ci.color_id AND ci.user_id = $userId " +
+                "WHERE pc.id = $colorId;"
+
+        println(query)
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val itemsArray = response.body()?.getAsJsonArray("queryset")
+                    if (itemsArray != null && itemsArray.size() > 0) {
+                        val itemObject = itemsArray.get(0).asJsonObject
+                        if (!itemObject.get("item_id").isJsonNull)
+                            Toast.makeText(context, "Articolo già presente nel carrello", Toast.LENGTH_LONG).show()
+                        else{
+                            val stock = itemObject.get("stock")?.asInt
+                            if (stock == 0)
+                                Toast.makeText(context, "Articolo non disponibile al momento", Toast.LENGTH_LONG).show()
+                            else {
+                                query = "INSERT INTO cart_items (user_id,color_id,quantity) VALUES ($userId,$colorId,1);"
+
+                                ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
+                                        override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                                            if (response.isSuccessful)
+                                                Toast.makeText(context, "Articolo aggiunto al carrello", Toast.LENGTH_SHORT).show()
+                                            else
+                                                Toast.makeText(context, "Errore nell'inserimento dell'articolo, riprova", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                                            Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(context, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
 }

@@ -58,6 +58,7 @@
                 android:layout_height="wrap_content" />
 
             <include
+                android:visibility="gone"
                 android:id="@+id/card_selection"
                 layout="@layout/card_selection"/>
 
@@ -67,6 +68,7 @@
                 android:layout_height="wrap_content" />
 
             <include
+                android:visibility="gone"
                 android:id="@+id/order_summary"
                 layout="@layout/order_summary"/>
 

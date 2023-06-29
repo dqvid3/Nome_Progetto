@@ -67,6 +67,13 @@
                 android:textColor="@android:color/holo_blue_light"
                 android:text="Rimuovi" />
 
+            <TextView
+                android:id="@+id/add_to_cart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/holo_blue_light"
+                android:text="Aggiungi al carrello" />
+
 
         </LinearLayout>
 

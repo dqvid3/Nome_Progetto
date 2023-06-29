@@ -140,11 +140,64 @@ class ProductDetailFragment : Fragment() {
             }
         }
 
+        val sharedPref = requireActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        val userId = sharedPref.getInt("ID", 0)
+        hasUserBought(userId,product?.id)
+
+        binding.addReviewButton.setOnClickListener{
+            if (binding.productRating.rating == 0.0f)
+                Toast.makeText(requireContext(), "Scegli un voto da dare al prodotto prima", Toast.LENGTH_LONG).show()
+            else if (binding.reviewText.text.isBlank())
+                Toast.makeText(requireContext(), "Insersici un tuo pensiero sul prodotto prima", Toast.LENGTH_LONG).show()
+            else
+                addReview(userId,product?.id,reviewList)
+        }
+
         binding.productName.text = product?.name
         binding.productDescription.text = product?.description
         binding.productPrice.text = product?.price.toString() + " €"
+        binding.productSpecs.text = "Larghezza: ${product?.width}\nLunghezza: ${product?.length}\nAltezza: ${product?.height}"
 
         return binding.root
+    }
+
+    private fun hasUserBought(userId: Int,productId: Int?){
+        var query = "SELECT EXISTS (SELECT 1 FROM orders o, order_items oi, product_colors pc " +
+                "WHERE o.id = oi.order_id AND oi.color_id = pc.id " +
+                "AND o.user_id = $userId AND pc.product_id = $productId) AS has_bought;"
+
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val hasBought = response.body()?.getAsJsonArray("queryset")?.get(0)
+                        ?.asJsonObject?.get("has_bought")?.asInt
+                    if (hasBought==1)
+                        hasUserReviewed(userId,productId)
+                }
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
+
+    private fun hasUserReviewed(userId: Int,productId: Int?){
+        var query = "SELECT EXISTS (SELECT 1 FROM product_reviews WHERE product_id = $productId AND user_id = $userId) " +
+                "AS has_reviewed;"
+
+        ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val hasReviewed = response.body()?.getAsJsonArray("queryset")?.get(0)
+                        ?.asJsonObject?.get("has_reviewed")?.asInt
+                    if (hasReviewed==1)
+                        binding.addReview.visibility = View.GONE
+                    else
+                        binding.addReview.visibility = View.VISIBLE
+                }
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
     }
 
     private fun outOfStock(){
@@ -161,7 +214,25 @@ class ProductDetailFragment : Fragment() {
         binding.addToCart.visibility = View.VISIBLE
     }
 
-    private fun addToCart(userId: Int?,qty: Int,colorId: Int){
+    private fun addReview(userId: Int,productId: Int?, reviewList: ArrayList<ProductReview>){
+        val query = "INSERT INTO product_reviews (product_id,user_id,rating,comment) " +
+                "VALUES ($productId,$userId,${binding.productRating.rating.toInt()},'${binding.reviewText.text.toString()}');"
+
+        ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(requireContext(), "Recensione effettuata con successo", Toast.LENGTH_SHORT).show()
+                    binding.addReview.visibility = View.GONE
+                    setReviews(productId, reviewList)
+                }else
+                    Toast.makeText(requireContext(), "Errore nell'inserimento dell'articolo, riprova", Toast.LENGTH_SHORT).show()
+            }
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                Toast.makeText(requireContext(), "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+        })
+    }
+
+    private fun addToCart(userId: Int,qty: Int,colorId: Int){
         var query = "SELECT id,quantity from cart_items where user_id=$userId and color_id=$colorId;"
 
         ClientNetwork.retrofit.select(query).enqueue(object : Callback<JsonObject> {
@@ -366,6 +437,7 @@ class ProductDetailFragment : Fragment() {
                 if (response.isSuccessful) {
                     val reviewsArray = response.body()?.getAsJsonArray("queryset")
                     if (reviewsArray != null && reviewsArray.size() > 0) {
+                        binding.emptyReviews.visibility = View.GONE
                         var loadedReviews = 0
                         for (i in 0 until reviewsArray.size()) {
                             val reviewObject = reviewsArray[i].asJsonObject
@@ -381,7 +453,7 @@ class ProductDetailFragment : Fragment() {
                             if (loadedReviews == reviewsArray.size())
                                 binding.recyclerReviewsView.adapter?.notifyDataSetChanged()
                         }
-                    }
+                    }else binding.emptyReviews.visibility = View.VISIBLE
                 }
             }
             override fun onFailure(call: Call<JsonObject>, t: Throwable) =

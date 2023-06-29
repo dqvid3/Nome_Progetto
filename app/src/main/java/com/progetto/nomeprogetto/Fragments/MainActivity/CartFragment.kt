@@ -15,7 +15,6 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Activities.BuyActivity
-import com.progetto.nomeprogetto.Activities.MainActivity
 import com.progetto.nomeprogetto.Adapters.CartAdapter
 import com.progetto.nomeprogetto.Adapters.CartAdapterListener
 import com.progetto.nomeprogetto.Adapters.WishlistAdapter
@@ -195,7 +194,14 @@ class CartFragment : Fragment(), CartAdapterListener {
                                                     productList.add(product)
                                                     loadedProducts++
                                                     if (loadedProducts == productsArray.size()) {
-                                                        if(type==0) binding.buyButton.visibility = View.VISIBLE
+                                                        if(type==0){
+                                                            for (p in productList) {
+                                                                if (p.stock != null && p.stock>0) {
+                                                                    binding.buyButton.visibility = View.VISIBLE
+                                                                    break
+                                                                }
+                                                            }
+                                                        }
                                                         binding.emptyCart.visibility = View.GONE
                                                         binding.recyclerView.visibility = View.VISIBLE
                                                         binding.recyclerView.adapter?.notifyDataSetChanged()

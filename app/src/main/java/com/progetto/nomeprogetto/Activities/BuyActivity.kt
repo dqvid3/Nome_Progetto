@@ -14,19 +14,16 @@ import com.google.gson.JsonObject
 import com.progetto.nomeprogetto.Adapters.AddressAdapter
 import com.progetto.nomeprogetto.Adapters.CardAdapter
 import com.progetto.nomeprogetto.Adapters.CartAdapter
-import com.progetto.nomeprogetto.Adapters.WishlistAdapter
 import com.progetto.nomeprogetto.ClientNetwork
 import com.progetto.nomeprogetto.Fragments.MainActivity.Account.AddAddressFragment
 import com.progetto.nomeprogetto.Fragments.MainActivity.Account.AddCardFragment
 import com.progetto.nomeprogetto.Fragments.MainActivity.Home.ProductDetailFragment
 import com.progetto.nomeprogetto.Objects.Product
-import com.progetto.nomeprogetto.Objects.User
 import com.progetto.nomeprogetto.Objects.UserAddress
 import com.progetto.nomeprogetto.Objects.UserCard
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.ActivityBuyBinding
 import okhttp3.ResponseBody
-import org.w3c.dom.Text
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -177,6 +174,8 @@ class BuyActivity : AppCompatActivity() {
                     var loadedAddresses = 0
                     val addressArray = response.body()?.getAsJsonArray("queryset")
                     if (addressArray != null && addressArray.size() > 0) {
+                        binding.addressSelection.addressListText.visibility = View.VISIBLE
+                        binding.cardSelection.root.visibility = View.VISIBLE
                         for (i in 0 until addressArray.size()) {
                             val addressObject = addressArray[i].asJsonObject
                             val id = addressObject.get("id").asInt
@@ -225,6 +224,9 @@ class BuyActivity : AppCompatActivity() {
                     var loadedCards = 0
                     val cardsArray = response.body()?.getAsJsonArray("queryset")
                     if (cardsArray != null && cardsArray.size() > 0) {
+                        binding.cardSelection.cardListText.visibility = View.VISIBLE
+                        binding.orderSummary.root.visibility = View.VISIBLE
+                        binding.buyButton.visibility = View.VISIBLE
                         for (i in 0 until cardsArray.size()) {
                             val cardObject = cardsArray[i].asJsonObject
                             val id = cardObject.get("id").asInt
@@ -319,7 +321,6 @@ class BuyActivity : AppCompatActivity() {
                                                         orderList.add(product)
                                                     loadedProducts++
                                                     if (loadedProducts == productsArray.size()) {
-                                                        binding.buyButton.visibility = View.VISIBLE
                                                         binding.orderSummary.recyclerOrderView.adapter?.notifyDataSetChanged()
                                                     }
                                                 }
@@ -383,7 +384,7 @@ class BuyActivity : AppCompatActivity() {
 
     private fun createOrder(orderList: ArrayList<Product>,totalAmt: Double, userId: Int){
         var query = "INSERT INTO orders (user_id,total_amount,payment_id,address_id) VALUES ($userId,$totalAmt," +
-        "(SELECT current_card_id FROM users WHERE id = $userId),(SELECT current_card_id FROM users WHERE id = $userId));"
+        "(SELECT current_card_id FROM users WHERE id = $userId),(SELECT current_address_id FROM users WHERE id = $userId));"
 
         ClientNetwork.retrofit.insert(query).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -406,7 +407,6 @@ class BuyActivity : AppCompatActivity() {
                                             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                                                 if (response.isSuccessful){
                                                     loadedProducts++
-                                                    println(product.name + " -- aa")
                                                     if (loadedProducts==orderList.size) {
                                                         removeFromCart(orderList)
                                                         Toast.makeText(this@BuyActivity, "Acquisto effettuato con successo", Toast.LENGTH_LONG).show()
@@ -435,8 +435,20 @@ class BuyActivity : AppCompatActivity() {
         var query = ""
         for(product in orderList){
             query = "DELETE FROM cart_items WHERE id = ${product.itemId};"
+
             ClientNetwork.retrofit.remove(query).enqueue(object : Callback<JsonObject> {
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
+                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                    if (response.isSuccessful){
+                        val quantity = product.quantity
+                        val qty = if (quantity != null) product.stock?.minus(quantity) else 0
+                        query = "UPDATE product_colors SET stock = ${qty} WHERE id = ${product.colorId};"
+                        ClientNetwork.retrofit.remove(query).enqueue(object : Callback<JsonObject> {
+                            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {}
+                            override fun onFailure(call: Call<JsonObject>, t: Throwable) =
+                                Toast.makeText(this@BuyActivity, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
+                        })
+                    }
+                }
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) =
                     Toast.makeText(this@BuyActivity, "Failed request: " + t.message, Toast.LENGTH_LONG).show()
             })
