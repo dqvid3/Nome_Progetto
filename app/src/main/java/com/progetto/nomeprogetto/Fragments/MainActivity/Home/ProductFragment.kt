@@ -97,12 +97,12 @@ class ProductFragment : Fragment() {
         val query: String
         if(searchType==0)
             query = "SELECT c.name as category,p.id,p.name,description,price,width,height,length,main_picture_path,upload_date," +
-                    "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
-                    "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
+                    "IF NULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
+                    "IF NULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
                     "FROM products p,categories c WHERE c.id=p.category_id and LOWER(p.name) LIKE LOWER('%$productSearched%');"
         else query = "SELECT p.id,p.name,p.description,price,width,height,length,main_picture_path,upload_date," +
-                "IFNULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
-                "IFNULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
+                "IF NULL((SELECT COUNT(*) FROM product_reviews WHERE product_id = p.id),0) AS review_count," +
+                "IF NULL((SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id),0) AS avg_rating " +
                 "FROM products p,categories c WHERE p.category_id = c.id and c.name='$productSearched';"
         val context = requireContext()
 
