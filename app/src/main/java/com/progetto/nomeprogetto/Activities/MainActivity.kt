@@ -1,5 +1,8 @@
 package com.progetto.nomeprogetto.Activities
 
+
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -31,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .add(binding.homeFragmentHomeContainer.id, HomeFragment())
             .commit()
+
 
         bottomNavigationSetUp()
 
@@ -115,3 +119,6 @@ class MainActivity : AppCompatActivity() {
         }, 2000)
     }
 }
+
+
+

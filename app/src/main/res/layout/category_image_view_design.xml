@@ -10,7 +10,7 @@
         android:layout_width="172dp"
         android:layout_height="171dp"
         android:layout_marginBottom="10dp"
-        android:backgroundTint="@android:color/darker_gray"
+        android:backgroundTint="@android:color/secondary_text_dark"
         app:cardCornerRadius="110dp">
 
         <ImageView

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.progetto.nomeprogetto.R
 import com.progetto.nomeprogetto.databinding.FragmentAccountBinding
-
 class AccountFragment : Fragment() {
 
     private lateinit var binding: FragmentAccountBinding
@@ -31,6 +30,21 @@ class AccountFragment : Fragment() {
                 .hide(this)
                 .commit()
         }
+
+        binding.orderHistory.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .add(R.id.home_fragment_container, OrderHistoryFragment())
+                .hide(this)
+                .commit()
+        }
+        binding.modifyData.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .add(R.id.home_fragment_container, ModifyDataFragment())
+                .hide(this)
+                .commit()
+        }
+
+
 
         return binding.root
     }
